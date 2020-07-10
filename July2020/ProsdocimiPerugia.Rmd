@@ -1,0 +1,789 @@
+---
+title: "Changes in extremes"
+subtitle: "Detection and consequences"
+author: 'Ilaria Prosdocimi'
+date: '13 July 2020'
+output:
+  beamer_presentation: 
+    fonttheme: structurebold
+    keep_tex: yes
+    # latex_engine: xelatex
+    latex_engine: pdflatex
+    slide_level: 2
+    theme: boxes
+    fig_crop: true
+  pdf_document: default
+header-includes: \usepackage{amsmath, amssymb}\definecolor{univered}{rgb}{0.75,0.01,0.3}\definecolor{darkred}{RGB}{154,2,0} \beamertemplatenavigationsymbolsempty\setbeamercovered{invisible}\setbeamercolor{item projected}{bg=univered}\hypersetup{colorlinks,citecolor=univered,filecolor=univered,linkcolor=univered,urlcolor=univered}\setbeamertemplate{footline}{\leavevmode\begin{beamercolorbox}[wd=.33\paperwidth,right,ht=2.25ex,dp=1ex,rightskip=4ptplus1pt]{subsection in head/foot}\end{beamercolorbox}\begin{beamercolorbox}[wd=.33\paperwidth,center,ht=2.25ex,dp=1ex]{section in head/foot}\usebeamercolor[fg]{section in foot/head}\end{beamercolorbox}\begin{beamercolorbox}[wd=.34\paperwidth,ht=2.25ex,dp=1ex,leftskip=4pt plus 1pt,rightskip=4pt plus 1pt]{subsection in head/foot} \color{univered} \hfill \tiny \insertframenumber/\inserttotalframenumber \end{beamercolorbox}}\setbeamertemplate{navigation symbols}{}\setbeamercolor{frametitle}{fg=univered}\setbeamercolor{title}{fg=univered}\setbeamercolor{author}{fg=black}\setbeamersize{text margin left=0.9em,text margin right=0.8em}\setbeamertemplate{itemize items}{$\bullet$}\setbeamercolor{itemize item}{fg=univered}
+fontsize: 10pt
+classoption: compress
+---
+
+
+
+
+```{r,setup, include=FALSE}
+knitr::opts_chunk$set(cache=TRUE, echo = FALSE,warning = FALSE) 
+library(knitr)
+# setwd("/home/ilaria//Dropbox/Teaching/PerugiaSummerSchool/June2020")
+# system("sed -i 's/10pt/handout, 10pt/' inClassMaterial.tex");system("cp inClassMaterial.tex SinClassMaterial.tex"); system("pdflatex inClassMaterial.tex"); system("pdflatex inClassMaterial.tex")
+```
+
+
+## Change (?)
+
+
+
+Increasing interest in assessing changes in extremes related to natural hazards. 
+
+Many studies investigate changes in extreme rainfall and extreme flows. 
+
+Changes in magnitude/frequencies: infrastructures are designed to withstand extreme events of some magnitude. Problematic if these become more (or less!) frequent. 
+
+
+## What causes change 
+
+```{r urbext, fig.align='center',out.width="0.87\\textwidth"}
+knitr::include_graphics(path = "wrcr21514-fig-0002-m.png",auto_pdf = TRUE)
+```
+
+\footnotesize	from Prosdocimi et al. (2015), WRR, doi:10.1002/2015WR017065
+
+## What causes change 
+
+```{r resIndex, fig.align='center',out.width="0.98\\textwidth"}
+knitr::include_graphics(path = "ResIndex.png", auto_pdf = TRUE)
+```
+
+\ 
+
+\footnotesize	from Lopez Frances (2013), HESS, doi:10.5194/hess-17-3189-2013
+
+## What causes change 
+
+*Implicit* assumption: 
+
+```{r,fig.asp=0.5,cache=TRUE}
+### link found at https://www.ncdc.noaa.gov/cag/global/time-series
+url <- "https://www.ncdc.noaa.gov/cag/global/time-series/globe/land_ocean/ytd/12/1880-2019/data.csv"
+noaaTemp<- read.csv(url, skip=4,header = TRUE)
+plot(noaaTemp, bty="l", ylab = "Temp. anomaly", type="l",xlab=" ")
+mtext(1,line = 2, text = "Year")
+title(main = "Temperature anomalies", sub = "NOAA National Centers for Environmental information, Climate at a Glance: \n Global Time Series, published June 2020, retrieved on July 5, 2020 from https://www.ncdc.noaa.gov/cag/", cex.sub = 0.6)
+```
+
+## Why study change? 
+
+* Understand if process of interest (river flow, rainfall, etc) is evolving in time
+* Understand how process of interest is affected by external drivers 
+* Assess risk connected to a certain hazard and its evolution 
+* If this is changing, how to account for this 
+
+\  
+
+Detection, \pause attribution \pause and management. 
+
+## The Lostock at Littlewood Bridge 
+
+```{r LostockData,fig.asp=0.6, fig.height="0.75\textheight"}
+###  taken from the code used for the WRR 2015 publication 
+### values obtained as interpolation trough the Urbext values given in the paper
+data_urb <- 
+structure(list(WaterYear = c(1976, 1977, 1978, 1979, 1980, 1981, 1982, 
+                             1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991,
+                             1992, 1993,1994, 1995, 1996, 1997, 1998, 1999, 2000, 
+                             2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+                             2010, 2011), 
+               Urbext = c(9.00492, 9.39338, 9.78184, 10.1703, 10.28079, 10.39128,
+                          10.50177, 10.61226, 10.72275, 10.83324, 10.94373, 11.05422,
+                          11.16471, 11.2752, 11.36635, 11.4575, 11.54865, 11.6398,
+                          11.73095, 11.8221, 11.91325, 12.0044, 12.09555, 12.1867,
+                          12.61062, 13.03454, 13.45846, 13.88238, 14.3063, 14.73022,
+                          15.15414, 15.57806, 16.00198, 16.4259, 16.84982,17.27374)),
+          class = "data.frame", row.names = seq(1,36))
+pf70005 <- winfapReader::get_amax(70005) ### only till 2004 as station got closed 
+pf70005 <- pf70005[,c("WaterYear","Flow")]
+#### data used in the article 
+pf70005 <- rbind(pf70005,
+                 data.frame(WaterYear = c(2005,2006,2007,2008),
+                            Flow = c(18.2,23.7,33.5,31.1)))
+dr70005 <- as.data.frame(rnrfa::get_ts(70005,type = "cdr"))
+dr70005$Date <- as.Date(row.names(dr70005))
+dr70005$WaterYear <- winfapReader::water_year(dr70005$Date)
+dr70005 <- dr70005[dr70005$WaterYear %in% unique(pf70005$WaterYear),]
+sumrain70005 <- data.frame(WaterYear = unique(dr70005$WaterYear),
+  cdr = tapply(dr70005$cdr,factor(dr70005$WaterYear),mean))
+all70005 <- merge(
+  merge(sumrain70005, pf70005),
+  data_urb)
+par(bty = "l",mgp = c(2.4,0.8,0), mfrow = c(1,2))
+plot(all70005$WaterYear, all70005$Flow, xlab = "Water Year", ylab = expression(paste(Flow (m^3/s))), pch = 16)
+plot(all70005$WaterYear, all70005$Flow, xlab = "Water Year", ylab = expression(paste(Flow (m^3/s))), type="h",ylim=c(0,max(all70005$Flow)))
+```
+
+## The Lostock at Littlewood Bridge 
+
+```{r LostockDataExpl,fig.asp=0.6, fig.height="0.75\textheight"}
+par(bty = "l",mgp = c(2.4,0.8,0), mfrow = c(1,2))
+plot(all70005$cdr, all70005$Flow, xlab = "Mean annual rainfall", ylab = expression(paste(Flow (m^3/s))), pch = 16)
+plot(all70005$Urbext, all70005$Flow, xlab = "Urbext", ylab = expression(paste(Flow (m^3/s))), pch = 16)
+```
+
+## Statistical tools 
+
+We assume that $\boldsymbol{y} = (y_1, \ldots, y_n)$ is a random sample from a population. 
+
+We are interested in discovering some property of the population. 
+
+\pause 
+
+\ 
+
+Inference framework: 
+
+* Parametric: assume that $y_i$ is a realisation of some distribution described by **parameters** $\boldsymbol{\theta}$ ($f(y_i; \boldsymbol{\theta})$)
+* Non-parametric: no assumption on the distribution of $f(y)$ is made (well, less assumptions...) 
+
+## Parameteric framework
+
+Advantage of parametric framework:
+
+* Describe the whole distribution (including, for example, quantiles)
+* A very general framework 
+* Easy to extend to very complex models (but estimation can be complicated) 
+
+\ 
+
+\pause  
+
+The parametric framework: 
+
+* Assume that each member of the sample $y_i$ comes from some distribution $Y_i$
+* Often assumed: $(Y_1, \ldots, Y_n)$ are independent and identically distributed (iid)
+* Assume that $Y_i$ follows a known distribution parametrised by $\boldsymbol{\theta}$ 
+* (for example $Y_i \sim N(\mu, \sigma)$, with $\boldsymbol{\theta} = (\mu, \sigma)$)
+* Find estimates $\hat{\boldsymbol{\theta}}$ based on the sample
+
+
+## Estimation methods 
+
+* Method of moments 
+* Maximum likelihood 
+* Bayesian approaches 
+
+\pause 
+
+Choice of framework and estimation method should depend on: 
+
+* Actual data properties
+* Main inferential question (and importance of uncertainty assessment)
+* Computational hurdle
+* Model complexity
+* Presence of prior information (which can be formalised)
+
+## Maximum likelhood estimation 
+<!-- Assume $(y_1, \ldots, y_n)$ are iid from $Y$ with distribution $f(y,\boldsymbol{\theta})$.  -->
+The likelihood function is defined as 
+\[L(\boldsymbol{\theta}; \boldsymbol{y}) = \prod_{i=1}^{n} f(y_i, \boldsymbol{\theta}), \] 
+but calculations typically employ the log-likelihood 
+\[l(\boldsymbol{\theta}; \boldsymbol{y}) = \sum_{i=1}^{n} \log f(y_i, \boldsymbol{\theta}).\] 
+$\hat{\boldsymbol{\theta}}_{ML}$ is the value that maximises $l(\boldsymbol{\theta}; \boldsymbol{y})$. 
+\pause 
+
+Asymptotically ($n \rightarrow \infty$) we have that 
+$\hat{\boldsymbol{\theta}}_{ML} \sim N(\boldsymbol{\theta}, I_E(\boldsymbol{\theta})^{-1})$ 
+where $I_E(\boldsymbol{\theta})$ is the expected information matrix, with elements \[e_{i,j}(\theta) = E\left[ - \frac{d^2 l(\theta)}{d \theta_i d \theta_j} \right] \]
+Typically $I_E(\boldsymbol{\theta})$ is unknown: use the observed information matrix evaluated at $\hat{\boldsymbol{\theta}}$. 
+
+## Parametric models for change
+
+* Assume $Y_i$ comes from a distribution $f(\boldsymbol{\theta}_i,y_i)$ 
+* Assume $\boldsymbol{\theta}_i = g(\boldsymbol{x}_i)$
+* So $Y_i = (Y|X=x_i)$ with $f(g(\boldsymbol{x}_i),y_i)$ 
+
+\ 
+
+Example. Linear regression (with two explanatory variables): 
+
+* $Y_i \sim N(\mu_i, \sigma)$; $\boldsymbol{\theta}_i = (\mu_i, \sigma)$ 
+* $\mu_i = \beta _0 + \beta_1 x_{1i} + \beta_2 x_{2i}$ - linear relationship
+* $\sigma$ is constant 
+* As a consequence: $E[Y_i] = \beta _0 + \beta_1 x_{1i} + \beta_2 x_{2i}$, $V[Y_i] = \sigma^2$ 
+
+## Parametric models for change
+
+Linear regression likelihood: 
+
+\[l(\boldsymbol{\theta}; \boldsymbol{y}) = \sum_{i=1}^{n} \log f(y_i, \boldsymbol{\theta}) \propto - n \log(\sigma) - \frac{(y-\beta _0 - \beta_1 x_{1i} - \beta_2 x_{2i})^2}{2 \sigma^2} \] 
+ML estimates can be derived analytically: $(\hat{\beta}_0, \hat{\beta}_1,\hat{\beta}_2,\hat{\sigma})$. 
+
+And we have, for example, $\hat{\beta}_i \sim N(\beta_i, \hat{\sigma}_{\beta_i})$. 
+
+From this once can construct confidence intervals for $\beta_i$ or perform a test such as: 
+\[H_0: \beta_0 \geq \tilde{\beta} \quad \quad VS  \quad \quad H_0: \beta_0 < \tilde{\beta}\]
+By default $\tilde{\beta} = 0$, but one can test for any value $\tilde{\beta}$ and any type of statistical test (equality, larger than or equal, smaller than or equal). 
+
+\ 
+
+Notice that if $x_j$ is a factor one can account for step changes (change points). 
+
+## Parametric models of change in extremes 
+
+Describing extremes is a different task than describing the typical behaviour. 
+
+$(y_1, \ldots, y_n)$ is a sample of extremes: what is a reasonable assumption for Y? 
+
+Extreme Value Theory gives theoretical derivation, but practice is often different. 
+
+Regardless of the choice of $f(y, \boldsymbol{\theta})$ - parametric models of change for extremes can be easily constructed assuming $Y_i=(Y|X=x_i)$ and $\boldsymbol{\theta}_i = g(\boldsymbol{x}_i)$. 
+
+\pause  
+
+What is an extreme? 
+
+* Largest event over a certain amount of time (eg water year, season)
+* Events larger than a certain high threshold (independent events?)
+
+## Parametric models in extremes 
+
+Traditional (asymptotic) results based on extremes of stationary series: 
+
+* Block maxima: $Y \sim GEV(\mu, \sigma, \xi)$
+* Threshold exceedance magnitude: $Y \sim GP(\sigma, \xi)$
+* Threshold exceedance frequency: $N \sim Pois(\lambda)$ 
+
+
+\pause 
+
+Exceedances frequency and magnitude traditionally modelled as separate processes. 
+
+Frequency and magnitude of threshold exceedances can be modelled in a unique framework using a Point Process representation of extremes \footnote{Smith, Statist. Sci., doi:10.1214/ss/1177012400}. \pause This representation is under-utilised in hydrology. 
+
+ \pause  Using exceedances typically results in larger samples (so less variability in estimates). 
+
+\pause 
+
+In practice other distributions are often assumed for Flow maxima 
+
+
+
+## Generalised Extreme Value distribution  
+
+\[ \text{The GEV CDF:} \quad F(y, \boldsymbol \theta) =  \exp\left\{ -\left( 1 + \xi \frac{y-\mu}{\sigma} \right) ^{-1/\xi} \right\}\]
+$\boldsymbol\theta = (\mu, \sigma, \xi)$: 
+
+* $\mu \in \mathbb{R}$: location parameter
+* $\sigma > 0$; scale parameter
+* $\xi \in \mathbb{R}$: shape parameter.
+
+<!-- Note that up to $1/\xi$  moments exist, so typically one would want $\xi < 1/2$ (so the variance exist). Also, to ensure consistency of the MLE (Smith, 1985) one needs $\xi > -1$. So typically one wants $\xi \in (-1, 0.5)$. -->
+
+$Y \sim GEV(\mu, \sigma,\xi)$ is defined on ${y: 1 + \xi (y - \mu)/\sigma > 0}$, this means: 
+<!-- so the domain changes depending on the sign of $\xi$: -->
+
+* $y \in \left[ \mu -\sigma/\xi, \infty \right)$, if $\xi > 0$ (Frechet)
+* $y \in \left( -\infty, \mu -\sigma/\xi \right]$, if $\xi < 0$ (Weibull)
+* $y \in \left( -\infty, \infty \right)$, if $\xi = 0$ (Gumbel)
+
+BUT! In engineering/hydrology $Y \sim GEV(\xi, \alpha, \kappa)$ and $\kappa = -\xi$. Software can use different parametrisation.
+
+\pause 
+
+Quantile function (for $\xi \neq 0$): 
+\[q(y, \theta) = \mu + \frac{\sigma}{\xi} \left[(-\log(1-p))^{-\xi} -1 \right] \]
+
+
+## Changes in annual maxima - choice of distribution 
+
+The Lostock at Littlewood Bridge: median and effective 50-yrs event. 
+<!-- Impact of distribution choice.  -->
+
+```{r allRetsPlots,fig.asp=0.6,dev="png",fig.height="0.7\textheight"}
+# ilaprosUtils is an R package available on github
+# remotes::install_github("ilapros/ilaprosUtils")
+y <- all70005$Flow; n <- length(y)
+glofit0 <- ilaprosUtils::glod.fit(y,show = FALSE)
+gevfit0 <- ilaprosUtils::gevd.fit(y,show = FALSE)
+lnfit0 <- lm(log(y)~1)
+x <- matrix(scale(all70005$WaterYear,center = 1974,scale = 35),ncol=1)
+glofit1 <- ilaprosUtils::glod.fit(y, ydat = x, mul=1,show = FALSE)
+gevfit1 <- ilaprosUtils::gevd.fit(y, ydat = x, mul=1,show = FALSE)
+lnfit1 <- lm(log(y)~x)
+par(bty="l",mgp = c(2.4,0.8,0),mai = c(0.9,0.77,0.3,0.2),pch=16)
+with(all70005, plot(WaterYear,Flow, ylim = c(10,48)))
+lines(all70005$WaterYear, rep(lmom::quagev(f = .5,gevfit0$mle*c(1,1,-1)),n))
+lines(all70005$WaterYear, rep(lmom::quaglo(f = .5,glofit0$mle),n), col =4)
+lines(all70005$WaterYear, rep(qlnorm(0.5,lnfit0$coefficients[1],summary(lnfit0)$sigma),n), col =6)
+lines(all70005$WaterYear, rep(lmom::quagev(f = .98,gevfit0$mle*c(1,1,-1)),n), lty=2)
+lines(all70005$WaterYear, rep(lmom::quaglo(f = .98,glofit0$mle),n), col =4, lty=2)
+lines(all70005$WaterYear, rep(qlnorm(0.98,lnfit0$coefficients[1],summary(lnfit0)$sigma),n), col =6, lty=2)
+
+lines(all70005$WaterYear, apply(cbind(cbind(1,x) %*% gevfit1$mle[1:2],gevfit1$mle[3],gevfit1$mle[4]),1, function(x) lmom::quagev(f = 0.5,c(x[1],x[2],-x[3]))), lty = 3)
+lines(all70005$WaterYear, apply(cbind(cbind(1,x) %*% glofit1$mle[1:2],glofit1$mle[3],glofit1$mle[4]),1, function(x) lmom::quaglo(f = 0.5,c(x[1],x[2],x[3]))), col =4, lty = 3)
+lines(all70005$WaterYear, qlnorm(0.5,lnfit1$fitted.values,summary(lnfit1)$sigma), col =6, lty = 3)
+lines(all70005$WaterYear, apply(cbind(cbind(1,x) %*% gevfit1$mle[1:2],gevfit1$mle[3],gevfit1$mle[4]),1, function(x) lmom::quagev(f = 0.98,c(x[1],x[2],-x[3]))))
+lines(all70005$WaterYear, apply(cbind(cbind(1,x) %*% glofit1$mle[1:2],glofit1$mle[3],glofit1$mle[4]),1, function(x) lmom::quaglo(f = 0.98,c(x[1],x[2],x[3]))), col =4)
+lines(all70005$WaterYear, qlnorm(0.98,lnfit1$fitted.values,summary(lnfit1)$sigma), col =6)
+legend("topleft", col=c(1,4,6),bty="n",lwd=2,legend = c("GEV","GLO","LN"))
+```
+
+
+## Changes in annual maxima 
+
+Time is not a cause for change, but land cover changes impact peak flow.  
+\[\mu=\mu_0 + \mu_{urb} urb \quad \text{while } (\sigma, \xi)  \text{ constant }\]
+
+```{r urbextFit,fig.asp=0.6,dev="png",fig.height="0.7\textheight"}
+### extRemes fits only GEV but allows handy computations for uncertainity 
+y <- all70005$Flow; n <- length(y)
+gevfit0 <- extRemes::fevd(y)
+gevfiturb1 <- extRemes::fevd(Flow, location.fun = ~Urbext, data = all70005)
+```
+
+```{r urbextRetPlot,fig.asp=0.6,dev="png",fig.height="0.7\textheight"}
+x <- matrix(seq(min(all70005$Urbext), max(all70005$Urbext), length.out = n),ncol=1)
+par(bty="l",mgp = c(2.4,0.8,0),mai = c(0.9,0.77,0.3,0.2),pch=16)
+with(all70005, plot(Urbext, Flow, ylim = c(10,48)))
+lines(x, rep(lmom::quagev(f = .5,gevfit0$results$par*c(1,1,-1)),n))
+lines(x, rep(lmom::quagev(f = .98,gevfit0$results$par*c(1,1,-1)),n), lty=2)
+
+lines(x, apply(cbind(cbind(1,x) %*% gevfiturb1$results$par[1:2],gevfiturb1$results$par[3],gevfiturb1$results$par[4]),1, function(x) lmom::quagev(f = 0.5,c(x[1],x[2],-x[3]))), lty = 4)
+lines(x, apply(cbind(cbind(1,x) %*% gevfiturb1$results$par[1:2],gevfiturb1$results$par[3],gevfiturb1$results$par[4]),1, function(x) lmom::quagev(f = 0.98,c(x[1],x[2],-x[3]))))
+```
+
+
+
+## Changes in annual maxima 
+
+Time is not a cause for change, but soil wetness impact peak flow.  
+\[\mu=\mu_0 + \mu_{rain} rain \quad \text{while } (\sigma, \xi)  \text{ constant }\]
+
+```{r rainMod,fig.asp=0.6,dev="png",fig.height="0.7\textheight"}
+gevfitrain1 <- extRemes::fevd(Flow, location.fun = ~cdr, data = all70005)
+```
+
+```{r rainRetPlot,fig.asp=0.6,dev="png",fig.height="0.7\textheight"}
+x <- matrix(seq(min(all70005$cdr), max(all70005$cdr), length.out = n),ncol=1)
+par(bty="l",mgp = c(2.4,0.8,0),mai = c(0.9,0.77,0.3,0.2),pch=16)
+with(all70005, plot(cdr, Flow, ylim = c(10,48), xlab ="Mean Rainfall"))
+lines(x, rep(lmom::quagev(f = .5,gevfit0$results$par*c(1,1,-1)),n))
+lines(x, rep(lmom::quagev(f = .98,gevfit0$results$par*c(1,1,-1)),n), lty=2)
+
+lines(x, apply(cbind(cbind(1,x) %*% gevfitrain1$results$par[1:2],gevfitrain1$results$par[3],gevfitrain1$results$par[4]),1, function(x) lmom::quagev(f = 0.5,c(x[1],x[2],-x[3]))), lty = 4)
+lines(x, apply(cbind(cbind(1,x) %*% gevfitrain1$results$par[1:2],gevfitrain1$results$par[3],gevfitrain1$results$par[4]),1, function(x) lmom::quagev(f = 0.98,c(x[1],x[2],-x[3]))))
+```
+
+## Changes in amax - effect of rain given Urbext
+
+Separate effect of rain and urbanisation:  
+\[\mu=\mu_0 + \mu_{rain} rain + \mu_{urb} urb \quad \text{while } (\sigma, \xi)  \text{ constant }\]
+
+```{r rainUrbMod,fig.asp=0.6,dev="png",fig.height="0.7\textheight"}
+gevfiturbrain2 <- extRemes::fevd(Flow, location.fun = ~Urbext+cdr, data = all70005)
+```
+
+```{r rainGivenUrbRetPlot,fig.asp=0.6,dev="png",fig.height="0.7\textheight"}
+nmat <- 20
+# x <- expand.grid(seq(min(all70005$cdr), max(all70005$cdr), length.out = nmat),
+#                  seq(min(all70005$Urbext), max(all70005$Urbext), length.out = 2))
+x <- as.matrix(all70005[order(all70005$cdr),][,c("Urbext","cdr")])
+x <- as.matrix(x)
+par(bty="l",mgp = c(2.4,0.8,0),mai = c(0.9,0.77,0.3,0.2),pch=16)
+with(all70005, plot(cdr, Flow, ylim = c(10,48), xlab ="Mean Rainfall"))
+lines(x[,2], rep(lmom::quagev(f = .5,gevfit0$results$par*c(1,1,-1)),n))
+
+
+lines(x[,2], apply(cbind(cbind(1,x) %*% gevfiturbrain2$results$par[1:3],gevfiturbrain2$results$par[4],gevfiturbrain2$results$par[5]),1, function(x) lmom::quagev(f = 0.5,c(x[1],x[2],-x[3]))), col = "firebrick4")
+lines(x[,2], apply(cbind(cbind(1,median(x[,1]),x[,2]) %*% gevfiturbrain2$results$par[1:3],gevfiturbrain2$results$par[4],gevfiturbrain2$results$par[5]),1, function(x) lmom::quagev(f = 0.5,c(x[1],x[2],-x[3]))), col = "firebrick2")
+```
+
+## Changes in amax - effect of Urbext given rain 
+
+Separate effect of rain and urbanisation:  
+\[\mu=\mu_0 + \mu_{rain} rain + \mu_{urb} urb \quad \text{while } (\sigma, \xi)  \text{ constant }\]
+
+```{r urbGivenRainRetPlot,fig.asp=0.6,dev="png",fig.height="0.7\textheight"}
+x <- x[order(x[,1]),] ## ordered by urbext
+par(bty="l",mgp = c(2.4,0.8,0),mai = c(0.9,0.77,0.3,0.2),pch=16)
+with(all70005, plot(Urbext, Flow, ylim = c(10,48), xlab ="Urbext"))
+lines(x[,1], rep(lmom::quagev(f = .5,gevfit0$results$par*c(1,1,-1)),n))
+# lines(x[1:nmat,1], rep(lmom::quagev(f = .98,gevfit0$results$par*c(1,1,-1)),nmat), lty=2)
+
+lines(x[,1], apply(cbind(cbind(1,x) %*% gevfiturbrain2$results$par[1:3],gevfiturbrain2$results$par[4],gevfiturbrain2$results$par[5]),1, function(x) lmom::quagev(f = 0.5,c(x[1],x[2],-x[3]))), col = "forestgreen")
+lines(x[,1], apply(cbind(cbind(1,x[,1],median(x[,2])) %*% gevfiturbrain2$results$par[1:3],gevfiturbrain2$results$par[4],gevfiturbrain2$results$par[5]),1, function(x) lmom::quagev(f = 0.5,c(x[1],x[2],-x[3]))), col = "green3", lwd = 2)
+```
+
+
+## Changes in annual maxima - estimated parameters 
+
+Rain as covariate (log-lik: `r format(-gevfitrain1$results$value, digits = 4)`)
+
+```{r}
+x <- format(rbind(gevfitrain1$results$par,
+                  sqrt(diag(solve(gevfitrain1$results$hessian)))),digits = 1)
+x <- cbind(cbind(x[,1], c("-","-")),x[,2:4])
+colnames(x) <- c("$\\mu_0$","$\\mu_{urb}$","$\\mu_{rain}$","$\\sigma$","$\\xi$")
+rownames(x) <- c("MLE","se")
+knitr::kable(x)
+```
+
+Urbext as covariate (log-lik: `r format(-gevfiturb1$results$value, nsmall = 1)`)
+
+```{r}
+x <- format(rbind(gevfiturb1$results$par,
+                   sqrt(diag(solve(gevfiturb1$results$hessian)))),digits = 1)
+x <- cbind(cbind(x[,1:2], c("-","-")),x[,3:4])
+colnames(x) <- c("$\\mu_0$","$\\mu_{urb}$","$\\mu_{rain}$","$\\sigma$","$\\xi$")
+rownames(x) <- c("MLE","se")
+knitr::kable(x)
+```
+
+Rain and urbext as covariate (log-lik: `r format(-gevfiturbrain2$results$value, digits = 4)`)
+
+```{r}
+x <- format(rbind(gevfiturbrain2$results$par,
+                   sqrt(diag(solve(gevfiturbrain2$results$hessian)))),digits = 2)
+colnames(x) <- c("$\\mu_0$","$\\mu_{urb}$","$\\mu_{rain}$","$\\sigma$","$\\xi$")
+rownames(x) <- c("MLE","se")
+knitr::kable(x)
+```
+
+## Changes is peaks over threshold 
+
+Extract observations above a high threshold
+
+```{r, fig.asp=0.7, fig.height="0.65\textheight"}
+pot70005 <- structure(list(Date = structure(c(2526, 2532, 2581, 2590, 2598, 
+2612, 2634, 2646, 2668, 2672, 2720, 2735, 2738, 2794, 2829, 2833, 
+2852, 2864, 2869, 2880, 2884, 2913, 2944, 2949, 2953, 2956, 2995, 
+3094, 3139, 3194, 3240, 3243, 3249, 3270, 3283, 3293, 3318, 3356, 
+3372, 3384, 3413, 3433, 3507, 3513, 3521, 3594, 3599, 3615, 3625, 
+3631, 3635, 3646, 3655, 3673, 3682, 3687, 3691, 3704, 3723, 3729, 
+3931, 3948, 3952, 3970, 3978, 3997, 4006, 4019, 4034, 4057, 4083, 
+4087, 4098, 4280, 4286, 4291, 4298, 4310, 4315, 4339, 4344, 4348, 
+4351, 4386, 4443, 4451, 4456, 4558, 4612, 4649, 4660, 4668, 4702, 
+4707, 4724, 4735, 4742, 4753, 4761, 4775, 4778, 4829, 4858, 4874, 
+5000, 5030, 5036, 5077, 5090, 5096, 5103, 5115, 5119, 5123, 5128, 
+5141, 5149, 5277, 5327, 5378, 5408, 5420, 5429, 5439, 5445, 5466, 
+5499, 5507, 5566, 5641, 5685, 5705, 5710, 5729, 5742, 5757, 5792, 
+5819, 5825, 5830, 5834, 5844, 5853, 5862, 5865, 5906, 5953, 6004, 
+6081, 6089, 6141, 6148, 6166, 6170, 6181, 6192, 6195, 6202, 6207, 
+6212, 6294, 6366, 6407, 6416, 6442, 6491, 6497, 6508, 6525, 6531, 
+6560, 6575, 6596, 6647, 6751, 6762, 6772, 6776, 6806, 6819, 6867, 
+6874, 6887, 6908, 6931, 6934, 6944, 6953, 6974, 6988, 6995, 7016, 
+7036, 7117, 7121, 7241, 7248, 7253, 7290, 7297, 7311, 7319, 7327, 
+7333, 7342, 7350, 7354, 7363, 7535, 7566, 7582, 7588, 7605, 7609, 
+7625, 7664, 7671, 7677, 7722, 7747, 7761, 7852, 7857, 7926, 7936, 
+7976, 7984, 7991, 8024, 8039, 8088, 8097, 8106, 8115, 8155, 8167, 
+8194, 8255, 8274, 8291, 8310, 8336, 8348, 8361, 8371, 8380, 8387, 
+8429, 8508, 8546, 8562, 8600, 8617, 8621, 8658, 8682, 8718, 8742, 
+8749, 8753, 8757, 8762, 8767, 8790, 8837, 8856, 8863, 8970, 8978, 
+9021, 9040, 9061, 9065, 9089, 9109, 9116, 9127, 9140, 9155, 9162, 
+9172, 9180, 9183, 9190, 9322, 9449, 9458, 9486, 9538, 9544, 9567, 
+9609, 9638, 9675, 9678, 9706, 9714, 9718, 9733, 9768, 9784, 9806, 
+9824, 9829, 9833, 9849, 9896, 9909, 9916, 9986, 9999, 10024, 
+10068, 10074, 10094, 10177, 10181, 10201, 10205, 10218, 10223, 
+10234, 10244, 10288, 10291, 10319, 10428, 10441, 10460, 10478, 
+10543, 10556, 10568, 10572, 10598, 10607, 10619, 10641, 10652, 
+10718, 10770, 10792, 10804, 10817, 10821, 10866, 10901, 10928, 
+10936, 10942, 10968, 11005, 11014, 11018, 11112, 11183, 11201, 
+11220, 11224, 11228, 11235, 11239, 11255, 11260, 11267, 11275, 
+11280, 11287, 11299, 11304, 11358, 11365, 11416, 11419, 11592, 
+11596, 11599, 11603, 11655, 11660, 11713, 11726, 11738, 11743, 
+11833, 11852, 11873, 11901, 11909, 11940, 11972, 11981, 11985, 
+11994, 11999, 12005, 12023, 12051, 12055, 12119, 12174, 12194, 
+12233, 12250, 12274, 12370, 12376, 12412, 12432, 12448, 12452, 
+12496, 12593, 12633, 12640, 12643, 12650, 12655, 12676, 12682, 
+12698, 12714, 12740, 12769, 12774, 12780, 12783, 12791, 12795, 
+12803, 12826, 12853, 12889, 13035, 13054, 13068, 13080, 13091, 
+13095, 13121, 13194, 13215, 13222, 13239, 13249, 13288, 13292, 
+13379, 13393, 13405, 13426, 13446, 13477, 13487, 13493, 13497, 
+13521, 13531, 13679, 13700, 13707, 13711, 13715, 13777, 13780, 
+13814, 13849, 13854, 13875, 13888, 13895, 13899, 13968, 13981, 
+14027, 14056, 14070, 14110, 14128, 14131, 14153, 14157, 14166, 
+14174, 14178, 14192, 14218, 14226, 14232, 14266, 14272, 14432, 
+14437, 14454, 14490), class = "Date"), Flow = c(10.576, 5.928, 
+4.498, 3.28, 9.92, 13.242, 2.96, 3.11, 7.266, 8.369, 2.99, 4.498, 
+8.701, 9.381, 4.585, 18.501, 6.899, 10.133, 7.814, 8.313, 11.594, 
+7.96, 16.062, 11.218, 6.994, 6.388, 8.893, 6.795, 5.735, 15.641, 
+14.42, 14.754, 10.38, 11.594, 22.897, 19.369, 14.646, 11.833, 
+10.246, 6.582, 9.4, 9.569, 6.616, 6.156, 9.689, 10.848, 11.757, 
+8.739, 22.665, 9.233, 13.866, 14.219, 14.646, 18.726, 15.938, 
+14.503, 11.789, 9.86, 15.764, 9.589, 19.154, 29.997, 35.701, 
+24.695, 23.789, 17.224, 18.501, 19.586, 11.877, 13.75, 13.014, 
+18.08, 30.684, 11.594, 23.789, 22.665, 15.518, 17.007, 18.94, 
+22.449, 13.322, 22.897, 11.454, 13.843, 10.318, 15.69, 24.92, 
+28.594, 17.007, 9.819, 18.08, 18.94, 14.054, 13.414, 17.65, 13.843, 
+20.892, 16.187, 13.703, 13.995, 15.703, 15.189, 13.437, 14.587, 
+13.668, 25.146, 7.372, 7.064, 19.154, 5.357, 15.789, 11.953, 
+4.433, 11.616, 7.204, 7.461, 7.497, 6.83, 9.609, 9.4, 5.879, 
+17.43, 9.038, 9.096, 4.055, 3.12, 4.089, 10.618, 5.287, 3.03, 
+4.886, 4.767, 3.23, 7.605, 8.912, 10.576, 5.342, 8.53, 16.588, 
+4.819, 14.766, 8.587, 8.701, 7.408, 8.219, 5.104, 7.641, 7.696, 
+14.337, 5.807, 9.589, 15.396, 16.588, 8.407, 10.67, 10.618, 14.171, 
+8.435, 23.789, 8.454, 9.1, 9.02, 19.7, 8.63, 41.2, 9.48, 18.7, 
+7.08, 12.4, 10.9, 7.93, 14.6, 10.6, 8.91, 7.76, 6.88, 13.5, 19.9, 
+15.4, 20.2, 13.4, 6.86, 6.01, 10.6, 10.7, 17.5, 6.51, 7.46, 4.47, 
+4.89, 6.84, 5.08, 5.6, 15.8, 16.4, 9.32, 16.2, 6.26, 5.21, 5.9, 
+5.5, 6.6, 7.09, 13.2, 7.64, 4.21, 3.48, 4.54, 5.95, 8.99, 6.44, 
+14.4, 12.5, 7.04, 9.54, 13.9, 17.8, 7.98, 9.59, 6.95, 4.67, 8.61, 
+4.29, 5.46, 3.85, 13.7, 10, 6.43, 17.4, 23.4, 5.5, 8.46, 5.8, 
+8.27, 8.07, 7.92, 6.27, 7.08, 5.67, 5.69, 6.75, 16.9, 5.93, 9.75, 
+23, 15.5, 14.3, 5.18, 7.15, 4.61, 7.53, 10.1, 7.85, 9.14, 7.65, 
+8.87, 6.61, 12.1, 11.8, 16.1, 9.22, 14.8, 16.2, 15.3, 6.04, 13, 
+7.12, 5.74, 10.9, 11.3, 12.6, 17.3, 15.7, 17.6, 13, 13, 11, 12.5, 
+16.5, 21.7, 11.6, 12.3, 11.9, 9.82, 9.74, 2.49, 4.1, 7.42, 10.4, 
+7.02, 4.65, 4.93, 2.62, 6.97, 5.77, 2.39, 6.84, 2.44, 22, 4.48, 
+11, 13.3, 8.36, 4.75, 6.13, 8.8, 6.11, 15.7, 5.47, 10, 20.5, 
+6.06, 6.56, 7.8, 6.46, 8.2, 7.97, 12.9, 15.4, 8.59, 8.05, 20.2, 
+7.24, 16.2, 23.8, 6.98, 8.9, 9.43, 11.7, 13.9, 13.6, 9.32, 7.03, 
+8.84, 6.83, 14.8, 6.21, 6.76, 22.5, 9.82, 6.33, 7.4, 15.9, 8.61, 
+5.47, 23.7, 10.2, 16, 16.4, 11.8, 16.8, 8.99, 13.2, 12.6, 28.1, 
+10.4, 12.7, 11.9, 14.7, 11.1, 16.6, 25.9, 14.1, 30.3, 14.8, 14.5, 
+12.6, 13.3, 12.2, 9.59, 13.4, 22.7, 11, 20.7, 21.3, 8.79, 6.78, 
+21.3, 12.7, 6.92, 11.8, 13.1, 17.8, 17.7, 17.8, 15.3, 6.84, 23.3, 
+21, 16, 5.95, 17.4, 15.8, 9.71, 25.9, 11.3, 10.3, 22.2, 9.14, 
+17.7, 9.65, 19.4, 6.38, 15.2, 13.9, 11.6, 9.6, 22.8, 10.4, 17.9, 
+24.7, 11.1, 10.9, 10.5, 24.2, 20.9, 25.5, 12.2, 16.1, 13.2, 12.9, 
+26.2, 15.2, 14, 14.2, 13.3, 10.4, 11.4, 10.3, 8.28, 15.4, 7.09, 
+15.8, 8.05, 11.1, 12.1, 15.3, 17.9, 18.1, 12.8, 12.8, 11, 9.87, 
+16.3, 7.05, 12.8, 7.68, 18.2, 15.9, 11.8, 13.8, 14, 17.8, 14.2, 
+16.1, 13.2, 9.79, 23.7, 11.2, 22.7, 11.1, 19.6, 12.1, 20.8, 15.7, 
+12.3, 19.4, 20.2, 18, 21.1, 13.2, 33.5, 12, 13.2, 11.5, 13.7, 
+22.8, 19.9, 23.9, 16.7, 15.9, 23.5, 19, 14.4, 31.1, 14.1, 19.9, 
+17.8, 7.51, 14.1, 9.13, 7.09, 8.64, 7.44, 20.5)), row.names = c(NA, 
+495L), class = "data.frame")
+### these are the 15 highest flows per year at the gauge
+th <- as.numeric(quantile(pot70005$Flow,12/15)) ### keep 3 events per year 
+pot70005$WaterYear <- ilaprosUtils::date2wy(pot70005$Date)
+pot70005 <- merge(pot70005, all70005[,c("WaterYear","Urbext","cdr")])
+npot <- with(pot70005[pot70005$Flow > th,],
+             tapply(Flow, factor(WaterYear),length))
+par(bty="l",mgp = c(2.4,0.8,0),mai = c(0.9,0.77,0.3,0.2),pch=16)
+
+with(pot70005,plot(Date, Flow, col = "grey70"))
+abline(h=th, col = "orange2", lwd = 2)
+with(pot70005[pot70005$Flow > th,],
+     points(Date, Flow, col = "red3"))
+abline(v=as.Date(paste0(seq(1974,2015),"-10-10")), lty = 4, col = "grey70")
+```
+
+
+## Generalised Pareto Distribution
+
+$Y$ is taken to be the observations above a high threshold $u$ ($Y = (X|X>u)$).
+
+GP is the limiting distribution for the magnitude of exceedances.
+
+\[F(y, u, \boldsymbol \theta) =  1- \left( 1 + \xi \frac{y-u}{\tilde{\sigma}} \right) ^{-1/\xi}\]
+$u$ is a constant,  $\boldsymbol\theta = (\sigma, \xi)$: 
+
+* $\sigma > 0$; scale parameter
+* $\xi \in \mathbb{R}$: shape parameter.
+
+The domain changes depending on the sign of $\xi$:
+
+* $y \in \left[u, \infty \right)$, if $\xi \geq 0$
+* $y \in \left( -\infty, u -\sigma/\xi \right]$, if $\xi < 0$
+
+\[ \text{Quantile function:}\quad  q(p, u, \boldsymbol \theta) = u + \frac{\sigma}{\xi} (p^{-\xi} - 1) \]
+
+\pause
+
+
+Modelling change: $\sigma_0 + \sigma_1 x$ 
+
+
+\pause
+
+Frequency of exceedances: typically modelled as a Poisson (indep. of magnitude). 
+
+## Point Process representation of extremes 
+
+$N$ = {no. Exceedance in a Year}. $N \sim Pois(\lambda)$
+
+$P(\text{no. Exceedance in a Year})$ is linked to magnitudes. 
+
+Express this using GEV-parameters: 
+
+\[\log \lambda = -\frac{1}{\xi} \log\left[1+\xi \frac{u-\mu}{\sigma} \right]\]
+
+\pause 
+
+Express changes in magnitude and frequency in the same model
+
+Same meaning as GEV models of change 
+
+
+## Changes in Peaks - Point Process
+
+```{r ppFirstPlot}
+pot70005$sWY <- scale(pot70005$WaterYear,1975,35)
+pot70005$exc <- pot70005$Flow-th
+ppfit0 <- extRemes::fevd(Flow, threshold = th, type = "PP",
+                         data = pot70005, time.units = "15/year")
+ppfit1 <- extRemes::fevd(Flow, threshold = th, type = "PP",data = pot70005, location.fun = ~sWY, time.units = "15/year")
+ppfitrain1 <- extRemes::fevd(Flow, threshold = th, type = "PP",data = pot70005, location.fun = ~cdr, time.units = "15/year")
+ppfiturb1 <- extRemes::fevd(Flow, threshold = th, type = "PP",data = pot70005, location.fun = ~Urbext, time.units = "15/year")
+ppfiturbrain2 <- extRemes::fevd(Flow, threshold = th, type = "PP",data = pot70005, location.fun = ~Urbext+cdr, time.units = "15/year",initial = list(shape=-0.1))
+par(bty="l",mgp = c(2.4,0.8,0),mai = c(0.9,0.77,0.3,0.2),pch=16)
+with(pot70005[pot70005$Flow > th,],
+     plot(Date, Flow))
+# extRemes::return.level(ppfit0, return.preiod=2)
+# unique(extRemes::return.level(ppfit1, return.period=2))
+with(pot70005[pot70005$Flow > th,],
+     plot(Date, Flow))
+lines(as.Date(paste0(unique(pot70005$WaterYear),"-10-01")),
+      unique(extRemes::return.level(ppfit1, return.period=2)),
+      lwd=2)
+# with(pot70005[pot70005$Flow > th,],
+#      plot(Date, Flow))
+# with(pot70005[pot70005$Flow > th,],
+#      plot(cdr, Flow))
+# with(pot70005[pot70005$Flow > th,],
+#      plot(Urbext, Flow))
+```
+
+## Changes in extremes - comparing the models
+
+Rain and urbext as covariate - GEV: 
+
+```{r}
+x <- format(rbind(gevfiturbrain2$results$par,
+                   sqrt(diag(solve(gevfiturbrain2$results$hessian)))),digits = 2)
+colnames(x) <- c("$\\mu_0$","$\\mu_{urb}$","$\\mu_{rain}$","$\\sigma$","$\\xi$")
+rownames(x) <- c("MLE","se")
+knitr::kable(x)
+```
+
+Rain and urbext as covariate - PP: 
+
+```{r}
+x <- format(rbind(ppfiturbrain2$results$par,
+                   sqrt(diag(solve(ppfiturbrain2$results$hessian)))),digits = 2)
+colnames(x) <- c("$\\mu_0$","$\\mu_{urb}$","$\\mu_{rain}$","$\\sigma$","$\\xi$")
+rownames(x) <- c("MLE","se")
+knitr::kable(x)
+```
+
+\pause
+
+Larger sample size leads to more precise estimation (statistically)
+
+Tail estimate is quite different 
+
+
+## Changes in extremes
+
+Parametric approaches: easy to include predictors and test for significance 
+
+\pause
+
+This might be a bug and not a feature 
+
+\pause 
+
+The assumption is that $Y_i=(Y|X = x_i)$ follows $f(y; \boldsymbol \theta)$ - goodness of fit should be carried out on **residuals** 
+
+Statistical EVT and practice are not aligned
+
+
+## Changes in extremes - attribution 
+
+Kendall's $\hat{\tau}$(Urbext, Rain) = `r format(with(all70005, cor(cdr, Urbext, method="k")),digits = 2)`.
+
+```{r urbAndRain,fig.asp=0.5,dev="png",fig.height="0.5\textheight"}
+par(bty="l",mgp = c(2.4,0.8,0),mai = c(0.9,0.77,0.3,0.2),pch=16)
+with(all70005, plot(Urbext, cdr, ylab ="Mean Rainfall"))
+``` 
+
+\pause 
+
+Reality is complex: linear models are a (over-simplified!) representation. 
+
+
+
+
+## Detection 
+
+Methods sometimes chosen because of data availability 
+
+Statistical models rely on assumption of iid random observations
+
+Short records: hard to identify complex evolutions 
+
+Short records: hard to observe a good range of the explantory variable 
+
+When detecting "change": what are we detecting?\footnote{Merz et al, HESS, doi:10.5194/hess-16-1379-2012} 
+
+## Attribution 
+
+Golden standard of causality is randomised trials: what about observational studies? 
+
+Climate sciences reproduce the treatment/placebo framework with numerical experiments (how good for extremes?). 
+
+Some numerical experiments done in hydrology - but systems are complex. 
+
+Causality: a cascade of impacts (with feedback\footnote{Zhang et al, Nature, doi:10.1038/s41586-018-0676-z})
+
+
+## Changes in annual maxima - uncertainity 
+
+Structures are designed for the "T-Year" event: estimated as the 1-1/T quantile. 
+
+If the distribution is changing so is the quantile.
+
+\pause
+ 
+```{r, include=TRUE}
+v <- extRemes::make.qcov(gevfitrain1, 
+               vals=list(mu1 = max(all70005$cdr)))
+x <- distillery::ci(gevfit0, return.period = 100)
+x <- c(as.vector(x))
+x <- rbind(x,
+  as.vector(distillery::ci(gevfitrain1, return.period = 100, qcov=v))[1:3])
+x <- cbind(x,x[,3]-x[,2])
+colnames(x) <- c("Q100","95\\% lb","95\\% ub","width")
+rownames(x) <- c("no-change","Rain = max(Rain)")
+knitr::kable(x,digits = 3)
+```
+
+Adding parameters adds variation to the estimates - is it worth it?
+
+\pause 
+Bias-variance trade-off and parsimonious models.
+
+## Changes in extremes - consequences 
+
+How to quantify risk under change?\footnote{Volpi, Wires Water, doi:10.1002/wat2.1340}
+
+Choice of distribution has an impact on estimates of rare events
+
+Today I used "effective design events": $q(p; \hat{\boldsymbol \theta})$. So at $X=x^{*}$: $q(p; \hat{\boldsymbol \theta}(x^{*}))$.
+
+Choice of distribution/model has an impact on estimates of rare events. 
+
+Choice of model has an impact of description of change. Compare effective return levels for $x^{*}$ and $x_0$: 
+\[q(p; \hat{\boldsymbol \theta}(x^{*})) - q(p; \hat{\boldsymbol \theta}(x_0)) = \mu_1 (x^{*}-x_0)\] 
+
+
+## (Statistical) reccomended reading 
+
+Coles, S (2001), An introduction to statistical modeling of extreme values, Springer 
+
+Katz, R.W., Parlange, M.B. and Naveau, P., 2002. Statistics of extremes in hydrology. Advances in water resources, 25(8-12), pp.1287-1304.
+
+Katz, Richard (2013) Statistical Methods for Nonstationary Extremes, Chapter 2 in A. AghaKouchak et al. (eds.), Extremes in a Changing Climate, Water Science
+and Technology Library 65, DOI 10.1007/978-94-007-4479-0 2,
+
+## Doing science the right way 
+
+Reproducibility crisis in several fields - open science movement as a results. 
+
+Replicability (i.e. being able to re-run the analysis) should be a given.
+
+Start any project in a replicable way: literate programming and programmatic interfaces 
+In R (and Python) this is increasingly feasible
+
+Slides code at [github.com/ilapros](www.github.com/ilapros/PerugiaSummerSchool/July2020)
+
+

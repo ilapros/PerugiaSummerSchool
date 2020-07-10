@@ -1,0 +1,867 @@
+---
+title: "Changes in extremes"
+subtitle: "Detection and consequences"
+author: 'Ilaria Prosdocimi'
+date: '13 July 2020'
+output:
+  beamer_presentation: 
+    fonttheme: structurebold
+    keep_tex: yes
+    # latex_engine: xelatex
+    latex_engine: pdflatex
+    slide_level: 2
+    theme: boxes
+    fig_crop: true
+  pdf_document: default
+header-includes: \usepackage{amsmath, amssymb}\definecolor{univered}{rgb}{0.75,0.01,0.3}\definecolor{darkred}{RGB}{154,2,0} \beamertemplatenavigationsymbolsempty\setbeamercovered{invisible}\setbeamercolor{item projected}{bg=univered}\hypersetup{colorlinks,citecolor=univered,filecolor=univered,linkcolor=univered,urlcolor=univered}\setbeamertemplate{footline}{\leavevmode\begin{beamercolorbox}[wd=.33\paperwidth,right,ht=2.25ex,dp=1ex,rightskip=4ptplus1pt]{subsection in head/foot}\end{beamercolorbox}\begin{beamercolorbox}[wd=.33\paperwidth,center,ht=2.25ex,dp=1ex]{section in head/foot}\usebeamercolor[fg]{section in foot/head}\end{beamercolorbox}\begin{beamercolorbox}[wd=.34\paperwidth,ht=2.25ex,dp=1ex,leftskip=4pt plus 1pt,rightskip=4pt plus 1pt]{subsection in head/foot} \color{univered} \hfill \tiny \insertframenumber/\inserttotalframenumber \end{beamercolorbox}}\setbeamertemplate{navigation symbols}{}\setbeamercolor{frametitle}{fg=univered}\setbeamercolor{title}{fg=univered}\setbeamercolor{author}{fg=black}\setbeamersize{text margin left=0.9em,text margin right=0.8em}\setbeamertemplate{itemize items}{$\bullet$}\setbeamercolor{itemize item}{fg=univered}
+fontsize: 10pt
+classoption: compress
+---
+
+
+
+
+```{r,setup, include=FALSE}
+knitr::opts_chunk$set(cache=TRUE, echo = FALSE,warning = FALSE) 
+library(knitr)
+# setwd("/home/ilaria//Dropbox/Teaching/PerugiaSummerSchool/June2020")
+# system("sed -i 's/10pt/handout, 10pt/' inClassMaterial.tex");system("cp inClassMaterial.tex SinClassMaterial.tex"); system("pdflatex inClassMaterial.tex"); system("pdflatex inClassMaterial.tex")
+```
+
+
+## Change (?)
+
+
+
+Increasing interest in assessing changes in extremes related to natural hazards. 
+
+Many studies investigate changes in extreme rainfall and extreme flows. 
+
+Changes in magnitude/frequencies: infrastructures are designed to withstand extreme events of some magnitude. Problematic if these become more (or less!) frequent. 
+
+
+## What causes change 
+
+```{r urbext, fig.align='center',out.width="0.87\\textwidth"}
+knitr::include_graphics(path = "wrcr21514-fig-0002-m.png",auto_pdf = TRUE)
+```
+
+\footnotesize	from Prosdocimi et al. (2015), WRR, doi:10.1002/2015WR017065
+
+## What causes change 
+
+```{r resIndex, fig.align='center',out.width="0.98\\textwidth"}
+knitr::include_graphics(path = "ResIndex.png", auto_pdf = TRUE)
+```
+
+\ 
+
+\footnotesize	from Lopez Frances (2013), HESS, doi:10.5194/hess-17-3189-2013
+
+## What causes change 
+
+*Implicit* assumption: 
+
+```{r,fig.asp=0.5,cache=TRUE}
+### link found at https://www.ncdc.noaa.gov/cag/global/time-series
+url <- "https://www.ncdc.noaa.gov/cag/global/time-series/globe/land_ocean/ytd/12/1880-2019/data.csv"
+noaaTemp<- read.csv(url, skip=4,header = TRUE)
+plot(noaaTemp, bty="l", ylab = "Temp. anomaly", type="l",xlab=" ")
+mtext(1,line = 2, text = "Year")
+title(main = "Temperature anomalies", sub = "NOAA National Centers for Environmental information, Climate at a Glance: \n Global Time Series, published June 2020, retrieved on July 5, 2020 from https://www.ncdc.noaa.gov/cag/", cex.sub = 0.6)
+```
+
+## Why study change? 
+
+* Understand if process of interest (river flow, rainfall, etc) is evolving in time
+* Understand how process of interest is affected by external drivers 
+* Assess risk connected to a certain hazard and its evolution 
+* If this is changing, how to account for this 
+
+\  
+
+Detection, \pause attribution \pause and management. 
+
+## The Lostock at Littlewood Bridge 
+
+```{r LostockData,fig.asp=0.6, fig.height="0.75\textheight"}
+###  taken from the code used for the WRR 2015 publication 
+### values obtained as interpolation trough the Urbext values given in the paper
+data_urb <- 
+structure(list(WaterYear = c(1976, 1977, 1978, 1979, 1980, 1981, 1982, 
+                             1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991,
+                             1992, 1993,1994, 1995, 1996, 1997, 1998, 1999, 2000, 
+                             2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+                             2010, 2011), 
+               Urbext = c(9.00492, 9.39338, 9.78184, 10.1703, 10.28079, 10.39128,
+                          10.50177, 10.61226, 10.72275, 10.83324, 10.94373, 11.05422,
+                          11.16471, 11.2752, 11.36635, 11.4575, 11.54865, 11.6398,
+                          11.73095, 11.8221, 11.91325, 12.0044, 12.09555, 12.1867,
+                          12.61062, 13.03454, 13.45846, 13.88238, 14.3063, 14.73022,
+                          15.15414, 15.57806, 16.00198, 16.4259, 16.84982,17.27374)),
+          class = "data.frame", row.names = seq(1,36))
+pf70005 <- winfapReader::get_amax(70005) ### only till 2004 as station got closed 
+pf70005 <- pf70005[,c("WaterYear","Flow")]
+#### data used in the article 
+pf70005 <- rbind(pf70005,
+                 data.frame(WaterYear = c(2005,2006,2007,2008),
+                            Flow = c(18.2,23.7,33.5,31.1)))
+dr70005 <- as.data.frame(rnrfa::get_ts(70005,type = "cdr"))
+dr70005$Date <- as.Date(row.names(dr70005))
+dr70005$WaterYear <- winfapReader::water_year(dr70005$Date)
+dr70005 <- dr70005[dr70005$WaterYear %in% unique(pf70005$WaterYear),]
+sumrain70005 <- data.frame(WaterYear = unique(dr70005$WaterYear),
+  cdr = tapply(dr70005$cdr,factor(dr70005$WaterYear),mean))
+all70005 <- merge(
+  merge(sumrain70005, pf70005),
+  data_urb)
+par(bty = "l",mgp = c(2.4,0.8,0), mfrow = c(1,2))
+plot(all70005$WaterYear, all70005$Flow, xlab = "Water Year", ylab = expression(paste(Flow (m^3/s))), pch = 16)
+plot(all70005$WaterYear, all70005$Flow, xlab = "Water Year", ylab = expression(paste(Flow (m^3/s))), type="h",ylim=c(0,max(all70005$Flow)))
+```
+
+## The Lostock at Littlewood Bridge 
+
+```{r LostockDataExpl,fig.asp=0.6, fig.height="0.75\textheight"}
+par(bty = "l",mgp = c(2.4,0.8,0), mfrow = c(1,2))
+plot(all70005$cdr, all70005$Flow, xlab = "Mean annual rainfall", ylab = expression(paste(Flow (m^3/s))), pch = 16)
+plot(all70005$Urbext, all70005$Flow, xlab = "Urbext", ylab = expression(paste(Flow (m^3/s))), pch = 16)
+```
+
+## Statistical tools 
+
+Choice of method should depend on application and data properties 
+
+* Non-parametric approaches
+* Parametric approaches
+
+
+(Note: non-parametric is a very loaded term)
+
+
+## Non-parametric: (Mann-)Kendall
+
+Test for a **monotonic** trend 
+
+* not relying on an estimate of the trend itself (test only)
+* usually combined with Theil-Sen trend estimate
+* based on relative ranking of data (not on data itself)
+
+Kendall's $\tau$ for a record $(y_1, \ldots, y_n)$
+
+$$
+S=\sum_{t<k}\mathrm{sign}(y_k - y_t),\qquad \mbox{with } \mathrm{sign}(x)=\left\{
+\begin{array}{cc}
+-1 & x < 0 \\
+0  & x = 0\\
+1 &  x > 0 
+\end{array}
+\right.$$
+
+\[ \hat{\tau} = \frac{S}{n (n-1)/2} \in [-1, 1] \]
+
+$\hat{\tau}$ for Flow and Urbext: `r format(with(all70005,cor(Urbext,Flow, method="k")),digits = 3)`; $\hat{\tau}$ for Flow and Rainfall: `r format(with(all70005,cor(cdr,Flow, method="k")),digits = 3)`.  
+
+Descriptive statistic: are these values large? 
+
+## Traditional hypothesis testing 
+
+* Assume that the sample comes from some distribution $Y$
+* (Often assumed at least that $(Y_1, \ldots, Y_n)$ are not correlated) 
+* Define the null ($H_0$) and alternative ($H_1$/$H_a$) hypothesis 
+* Define the significance level (type-I error) - think about the type-II error 
+* Construct a test statistic $t(Y)$ 
+* Study the distribution of $t(Y)$ under $H_0$ 
+* Derive the test statistic for the observed data $t(y)$
+* Assess whether the data is compatible with $H_0$ (often by means of p-values) 
+
+## Traditional hypothesis testing - Man-Kendall 
+
+Assume that $Y_1, \ldots, Y_n$  have no serial correlation 
+
+
+$H_0:$ Time series values are independent, identically distributed  ($H_0: \tau = 0$)
+
+$H_A:$ There is a monotonic (not necessarily linear) trend  ($H_1: \tau \neq 0$)
+
+For large samples (about n>8) S is normally distributed with
+$$E( S ) = 0,\qquad  Var ( S )\simeq\frac{n(n-1)(2n+5)}{18}$$
+
+
+In practice use standardized test statistic Z and compare to Normal distribution
+$$
+Z=\left\{
+\begin{array}{cc}
+(S-1)/\sqrt{Var(S)} & S > 0\\
+0 & S =0 \\
+(S+1)/\sqrt{Var(S)} & S < 0\\
+\end{array}
+\right. 
+$$
+
+Remark: need correction of $VAR(S)$ if there are some ties
+
+## Traditional hypothesis testing - Mann-Kendall 
+
+For Flow and Urbext of the Lostock: 
+$\hat{\tau}$=`r format(with(all70005,cor(Urbext,Flow, method="k")),digits = 3)`, $Z$=`r with(all70005,format(cor.test(Urbext,Flow,method = "k")$statistic,digits = 3))`. 
+
+```{r testStats, fig.asp=0.5,fig.height="0.4\textheight",fig.align='center'}
+par(bty = "n",mgp = c(2.4,0.8,0),mai=c(0.95,0.1,0.1,0.1))
+curve(dnorm, from = -4, to = 4, yaxt = "n", ylab = " ")
+points(with(all70005,cor.test(Urbext,Flow,method = "k")$statistic),0,pch=4,lwd=3,col=2)
+```
+
+The Z-value is extreme: pvalue is `r with(all70005,format(cor.test(Urbext,Flow,method = "k")$p.value,digits = 3))`.
+
+The data is not compatible with $H_0$ ("reject $H_0$"). 
+
+## Traditional hypothesis testing - considerations
+
+* The p-value calculation relies on a set of assumptions/procedures  
+* If any of these is not valid the test is void 
+* Not rejecting $H_0$ does not imply $H_0$ is "true": the p-value is a measure of evidence (based on several assumptions)
+* p-value: a measure of how the data is consistent with $H_0$ ($P(D|H_0)$)
+* p-value is NOT the probability of $H_0$ being true ($P(H_0|D)$) - see Cohen (1994) \footnote{Cohen, Jacob. "The earth is round (p<. 05)." American psychologist 49.12 (1994): 997.} 
+* The latter is more easily obtained using Bayesian approaches (and not traditional approaches) 
+
+Tests for Hydro-meteorological records: 
+
+* Hydro-meteorological records are opportunistic samples, not experiments. 
+* Hydro-meteorological records are typically short and noisy: low power.
+
+
+## Useful Links 
+
+[Comic about testing procedures](https://xkcd.com/882/)
+
+\ 
+
+[Comic about p-values](https://xkcd.com/1478/)
+
+\ 
+
+[Build your own p-values](https://fivethirtyeight.com/features/science-isnt-broken/\#part1)
+
+
+## Type I and Type II error 
+
+
+Testing $H_{0} \leq \mu_{0}$ VS $H_{1} > \mu_{0}$ at significance level $\alpha$
+
+
+```{r pow1_h0curve, fig.height="0.65\textheight", fig.asp=0.5}
+library(latex2exp)
+mu1=3.7; mu1s=5.5
+par(mai = c(0.4,0.2,0.2,0.2), bty = "l")
+plot(c(-5,12),c(0,dnorm(0)),type="n",bty="n",axes = FALSE,xlab=" ",ylab=" ")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1)))
+mtext(side = 1, text = TeX("$\\mu_0$"),at = 0,cex=1.75)
+mtext(side = 1, text = TeX("$z_{\\alpha}$"),at = qnorm(.95),cex=1.75)
+segments(x0=0,y0=0,y1=dnorm(0),lty=2)
+segments(x0=qnorm(.95),y0=0,y1=dnorm(qnorm(.95),0),lty=2)
+```
+
+## Type I and Type II error 
+
+True value of $\mu$ is \textcolor{red}{$\mu_{1}$}
+ 
+ 
+```{r pow2_h0h1curve, fig.height="0.65\textheight", fig.asp=0.5}
+par(mai = c(0.4,0.2,0.2,0.2), bty = "l")
+plot(c(-5,12),c(0,dnorm(0)),type="n",bty="n",axes = FALSE,xlab=" ",ylab=" ")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1)))
+mtext(side = 1, text = TeX("$\\mu_0$"),at = 0,cex=1.75)
+mtext(side = 1, text = TeX("$z_{\\alpha}$"),at = qnorm(.95))
+segments(x0=0,y0=0,y1=dnorm(0),lty=2)
+segments(x0=qnorm(.95),y0=0,y1=dnorm(qnorm(.95),0),lty=2)
+mtext(side = 1, text = TeX("$\\mu_1$"),at = mu1,col=2,cex=1.75)
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1),mu1),col=2)
+```
+
+## Type I and Type II error 
+
+```{r pow2b_h0h1curvepower, fig.height="0.65\textheight", fig.asp=0.5}
+par(mai = c(0.4,0.2,0.2,0.2), bty = "l",lwd=1.3)
+plot(c(-5,12),c(0,dnorm(0)),type="n",bty="n",axes = FALSE,xlab=" ",ylab=" ")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1)))
+mtext(side = 1, text = TeX("$\\mu_0$"),at = 0,cex=1.75)
+mtext(side = 1, text = TeX("$z_{\\alpha}$"),at = qnorm(.95),cex=1.75)
+segments(x0=0,y0=0,y1=dnorm(0),lty=2)
+segments(x0=qnorm(.95),y0=0,y1=dnorm(qnorm(.95),0),lty=2)
+mtext(side = 1, text = TeX("$\\mu_1$"),at = mu1,col=2,cex=1.75)
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1),mu1),col=2)
+segments(x0=qnorm(.95),y0=0,y1=dnorm(qnorm(.95),mu1),lty=2,col=2)
+polygon(c(seq(qnorm(.95),12,by=0.1),rev(seq(qnorm(.95),12,by=0.1))),
+        c(dnorm(seq(qnorm(.95),12,by=0.1),mu1),rep(0,104)),col=2,density = 9)
+```
+
+## Type I and Type II error 
+Power increases for larger true value \textcolor{blue}{$\mu_{1}$}
+
+
+```{r pow3_h0h1scurve, fig.height="0.65\textheight", fig.asp=0.5}
+par(mai = c(0.4,0.2,0.2,0.2), bty = "l")
+plot(c(-5,12),c(0,dnorm(0)),type="n",bty="n",axes = FALSE,xlab=" ",ylab=" ")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1)))
+mtext(side = 1, text = TeX("$\\mu_0$"),at = 0,cex=1.75)
+mtext(side = 1, text = TeX("$z_{\\alpha}$"),at = qnorm(.95),cex=1.75)
+segments(x0=0,y0=0,y1=dnorm(0),lty=2)
+segments(x0=qnorm(.95),y0=0,y1=dnorm(qnorm(.95),0),lty=2)
+mtext(side = 1, text = TeX("$\\mu_1$"),at = mu1,col=2,cex=1.75)
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1),mu1),col=2,cex=1.75)
+segments(x0=qnorm(.95),y0=0,y1=dnorm(qnorm(.95),mu1),lty=2,col=2)
+polygon(c(seq(qnorm(.95),12,by=0.1),rev(seq(qnorm(.95),12,by=0.1))),
+        c(dnorm(seq(qnorm(.95),12,by=0.1),mu1),rep(0,104)),col=2,density = 9)
+mtext(side = 1, text = TeX("$\\mu^*_1$"),at = mu1s,col=4,cex=1.75)
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1),mu1s),col=4)
+segments(x0=qnorm(.95),y0=0,y1=dnorm(qnorm(.95),mu1s),lty=2,col=4)
+polygon(c(seq(qnorm(.95),12,by=0.1),rev(seq(qnorm(.95),12,by=0.1))),
+        c(dnorm(seq(qnorm(.95),12,by=0.1),mu1s),rep(0,104)),col=4,density = 9,angle=135)
+```
+
+## Type I and Type II error 
+Power depends on sample size/population properties
+
+```{r pow4_h0smallerSamp, fig.height="0.65\textheight", fig.asp=0.5}
+sdc <- 1.6
+par(mai = c(0.4,0.2,0.2,0.2), bty = "l")
+plot(c(-5,12),c(0,dnorm(0,sd=min(1,sdc))),type="n",bty="n",axes = FALSE,xlab=" ",ylab=" ")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1)),col="slategray4")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1),sd=sdc))
+mtext(side = 1, text = TeX("$\\mu_0$"),at = 0,cex=1.75)
+segments(x0=0,y0=0,y1=dnorm(0),lty=2)
+segments(x0=qnorm(.95),y0=0,y1=dnorm(qnorm(.95),0),lty=1,col="slategray4")
+segments(x0=qnorm(.95,sd=sdc),y0=0,y1=dnorm(qnorm(.95,sd=sdc),0,sd=sdc),lty=2)
+mtext(side = 1, text = TeX("$z_{\\alpha}$"),at = qnorm(.95,sd=1),col="slategray4",cex=1.75)
+mtext(side = 1, text = TeX("$z_{\\alpha}$"),at = qnorm(.95,sd=sdc),cex=1.75)
+```
+
+## Type I and Type II error 
+
+Power diminishes for \textcolor{darkred}{more variable} distribution
+
+```{r pow5_h0smallerSampH1, fig.height="0.65\textheight", fig.asp=0.5}
+par(mai = c(0.4,0.2,0.2,0.2), bty = "l")
+plot(c(-5,12),c(0,dnorm(0,sd=min(1,sdc))),type="n",bty="n",axes = FALSE,xlab=" ",ylab=" ")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1)),col="slategray4")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1),sd=sdc))
+mtext(side = 1, text = TeX("$\\mu_0$"),at = 0,cex=1.75)
+segments(x0=qnorm(.95,sd=sdc),y0=0,y1=dnorm(qnorm(.95,sd=sdc),0,sd=sdc),lty=2)
+mtext(side = 1, text = TeX("$z_{\\alpha}$"),at = qnorm(.95,sd=sdc),cex=1.75)
+mtext(side = 1, text = TeX("$\\mu_1$"),at = mu1,col=2,cex=1.75)
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1),mu1,sd=1),col="red")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1),mu1,sd=sdc),col="darkred")
+polygon(c(seq(qnorm(.95,sd=sdc),12,by=0.1),rev(seq(qnorm(.95,sd=sdc),12,by=0.1))),
+        c(dnorm(seq(qnorm(.95,sd=sdc),12,by=0.1),mu1,sd=sdc),rep(0,94)),col="darkred",density = 9)
+```
+
+## Statistical tools: paramteric approaches 
+
+* Assume that each member of the sample $y_i$ comes from some distribution $Y_i$
+* Often assumed: $(Y_1, \ldots, Y_n)$ are independent and identically distributed (iid)
+* Assume that $Y_i$ follows a known distribution parametrised by $(\boldsymbol{\theta})$ 
+* (for example $Y_i \sim N(\mu, \sigma)$, with $\boldsymbol{\theta} = (\mu, \sigma)$)
+* Find estimates $\hat{\boldsymbol{\theta}}$ based on the sample
+* Estimates should somehow be derived so that there is an agreement between summaries of the data and summaries of the estimated distribution $f(\boldsymbol{y}; \boldsymbol{\theta})$  
+
+\pause  
+Parametric VS non-parametric: 
+
+* Parametric when a distribution described by **parameters** ($f(y; \boldsymbol{\theta})$)  is assumed 
+* Non-parametric when no assumption on the form of $f(y)$ is made 
+
+\pause  
+
+Advantage of parametric:
+
+* Describe the whole distribution (quantiles)
+* Easy to extend to very complex models (but estimation can be complicated) 
+* General framework 
+
+
+## Parametric approaches: estimation approaches
+
+Most common: 
+
+* Method of moments 
+* Maximum likelihood 
+* Bayesian approaches 
+
+Choice of estimation approach (can be) based on: 
+
+* Computational hurdle
+* Need for uncertainty assessment 
+* Model complexity
+* Presence of prior information (which can be formalised)
+
+## Maximum likelhood estimation 
+
+The likelihood function is defined as 
+\[L(\boldsymbol{\theta}; \boldsymbol{y}) = \prod_{i=1}^{n} f(y_i, \boldsymbol{\theta}), \] 
+but calculations typically employ the log-likelihood 
+\[l(\boldsymbol{\theta}; \boldsymbol{y}) = \sum_{i=1}^{n} \log f(y_i, \boldsymbol{\theta}).\] 
+
+
+Asymptotically ($n \rightarrow \infty$) we have that 
+$\hat{\boldsymbol{\theta}}_{ML} \sim N(\boldsymbol{\theta}, I_E(\boldsymbol{\theta}))$ 
+where $I_E(\boldsymbol{\theta})$ is the expected information matrix, with elements \[e_{i,j}(\theta) = E\left[ - \frac{d^2 l(\theta)}{d \theta_i d \theta_j} \right] \]
+Typically $I_E(\boldsymbol{\theta})$ is unknown and is replaced with the observed information matrix evaluated at $\hat{\boldsymbol{\theta}}$. 
+
+## Parametric models for change
+
+* Assume $Y_i$ distribution is $f(\boldsymbol{\theta}_i,y_i)$ 
+* Assume $\boldsymbol{\theta}_i = g(\boldsymbol{x}_i)$
+* So $Y_i = (Y|X=x_i)$ with $f(g(\boldsymbol{x}_i),y_i)$ 
+
+\ 
+
+Example. Linear regression (with two explanatory variables): 
+
+* $Y_i \sim N(\mu_i, \sigma)$; $\boldsymbol{\theta}_i = (\mu_i, \sigma)$ 
+* $\mu_i = \beta _0 + \beta_1 x_{1i} + \beta_2 x_{2i}$ - linear relationship
+* $\sigma$ is constant 
+* As a consequence: $E[Y_i] = \beta _0 + \beta_1 x_{1i} + \beta_2 x_{2i}$, $V[Y_i] = \sigma^2$ 
+
+\[l(\boldsymbol{\theta}; \boldsymbol{y}) = \sum_{i=1}^{n} \log f(y_i, \boldsymbol{\theta}) \propto - n \log(\sigma) - \frac{(y-\beta _0 - \beta_1 x_{1i} - \beta_2 x_{2i})^2}{2 \sigma^2} \] 
+ML estimates can be derived analytically: $(\hat{\beta}_0, \hat{\beta}_1,\hat{\beta}_2,\hat{\sigma})$. 
+
+And we have, for example, $\hat{\beta}_i \sim N(\beta, \sigma_{\beta_i})$. 
+
+From this once can construct confidence intervals for $\beta_i$ or perform a test such as 
+\[H_0: \beta_0 \geq \tilde{\beta} \quad \quad VS  \quad \quad H_0: \beta_0 < \tilde{\beta}\]
+By default $\tilde{\beta} = 0$, but one can test for any value and any type of statistical test (equality, larger than or equale, smaller than or equal). 
+
+
+
+## GEV 
+
+<!-- Typically defined using the CDF:  -->
+
+<!-- \[ F(y) =  \exp\left\{ -\left( 1 + \xi \frac{y-\mu}{\sigma} \right) ^{-1/\xi} \right\}\] -->
+
+<!-- * $\mu \in \mathbb{R}$: location parameter -->
+<!-- * $\sigma > 0$; scale parameter -->
+<!-- * $\xi \in \mathbb{R}$: shape parameter.  -->
+
+<!-- Note that up to $1/\xi$  moments exist, so typically one would want $\xi < 1/2$ (so the variance exist). Also, to ensure consistency of the MLE (Smith, 1985) one needs $\xi > -1$. So typically one wants $\xi \in (-1, 0.5)$.  -->
+
+<!-- $Y \sim GEV(\mu, \sigma,\xi)$ is defined on ${y: 1 + \xi (y - \mu)/\sigma > 0}$  so the domain changes depening on the sign of $\xi$:  -->
+
+<!-- * $y \in \left[ \mu -\sigma/\xi, \infty \right) $, if $\xi > 0$ (Frechet)  -->
+<!-- * $y \in \left( -\infty, \mu -\sigma/\xi \right] $, if $\xi < 0$ (Weibull)  -->
+<!-- * $y \in \left( -\infty, \infty \right) $, if $\xi = 0$ (Gumbel) -->
+
+<!-- BUT! In engineering/hydrology $Y \sim GEV(\xi, \alpha, \kappa)$ and $\kappa = -\xi$. Software can use inconsistent different parametrisation.  -->
+
+
+
+<!-- \begin{eqnarray} -->
+<!-- f_q(q)= \sigma^{-1}e^{-(1-\xi)t - e^{-t}}, \> t=\begin{cases} -->
+<!-- -\xi^{-1} \ln(1-\xi(q-\mu)/\sigma) ,  \ \  \mbox{when } \xi \neq 0 \\  -->
+<!-- (q-\mu)/\sigma , \ \ \mbox{when } \xi=0  -->
+<!-- \end{cases} -->
+<!-- \label{eq:gevPDF} -->
+<!-- \end{eqnarray} -->
+<!-- \begin{equation} -->
+<!-- F_q(q) = \exp \{ - e^{-t} \}  -->
+<!-- \label{eq:gevCDF} -->
+<!-- \end{equation} -->
+<!-- where $\mu$, $\sigma$, and $\xi$ are the location, scale and shape parameters.  -->
+<!-- The set of flow values $q$ in which the function is defined is determined by the shape parameter $\xi$ as: $-\infty  < q \leq \mu + \sigma/\xi$ if $\xi > 0$; $-\infty < q < \infty$ if $\xi = 0$; $ \mu + \sigma/\xi  < q < \infty$ if $\xi < 0$.  -->
+
+\ 
+
+Often $\nu= \log(\sigma)$ is used to ensure positive scale. 
+
+Estimation approaches: L-moments, Bayesian, maximum likelihood, maximum penalised likelihood/GML. 
+
+POT series contain information on two different processes: (i) the frequency at which a certain high threshold is exceeded and (ii) the magnitude of the peak flows. 
+Typically, the number of events recorded in each year is assumed to be Poisson distributed, while the magnitude of the exceedances above the threshold $u$ is assumed to be distributed according to a Generalized Pareto (GP) distribution
+It can be shown that the annual maxima $Q$ of a flow record in which the threshold exceeding process follows the standard Poisson-GP assumption for POT data, are asymptotically GEV distributed: $Q \sim GEV(\mu, \sigma, \xi)$. 
+
+
+
+
+
+```{r}
+### code = 00060;  Stream flow, mean. daily 
+### in Ohio  
+aa <- dataRetrieval::whatNWISdata(stateCD = "OH",parameterCd="00060")
+### code = 00061 Stream flow, instantaneous
+## in TX
+bb <- dataRetrieval::whatNWISdata(parameterCd="00061", stateCD = "TX")
+## select places with most up to date data 
+bb <- bb[bb$end_date > as.Date("2017-10-01"),]
+### see https://help.waterdata.usgs.gov/codes-and-parameters/peak-streamflow-special-conditions-peak.peak_cd 
+## to understand the code for peak conditions 
+
+s07312500if <- dataRetrieval::readNWISpeak(siteNumbers = "07312500")
+s07312500dv <- dataRetrieval::readNWISdv(siteNumbers = "07312500",parameterCd="00060")
+```
+
+
+
+
+## Non-parametric: (Mann-)Kendall
+
+Test for a **monotonic** trend 
+
+* not relying on an estimate of the trend itself (test only)
+* usually combined with Theil-Sen trend estimate
+* based on relative ranking of data (not on data itself)
+
+Kendall's $\tau$ for a record $(y_1, \ldots, y_n)$
+
+$$
+S=\sum_{t<k}\mathrm{sign}(y_k - y_t),\qquad \mbox{with } \mathrm{sign}(x)=\left\{
+\begin{array}{cc}
+-1 & x < 0 \\
+0  & x = 0\\
+1 &  x > 0 
+\end{array}
+\right.$$
+
+\[ \hat{\tau} = \frac{S}{n (n-1)/2} \in [-1, 1] \]
+
+$\hat{\tau}$ for Flow and Urbext: `r format(with(all70005,cor(Urbext,Flow, method="k")),digits = 3)`; $\hat{\tau}$ for Flow and Rainfall: `r format(with(all70005,cor(cdr,Flow, method="k")),digits = 3)`.  
+
+Descriptive statistic: are these values large? 
+
+## Traditional hypothesis testing 
+
+* Assume that the sample comes from some distribution $Y$
+* (Often assumed at least that $(Y_1, \ldots, Y_n)$ are not correlated) 
+* Define the null ($H_0$) and alternative ($H_1$/$H_a$) hypothesis 
+* Define the significance level (type-I error) - think about the type-II error 
+* Construct a test statistic $t(Y)$ 
+* Study the distribution of $t(Y)$ under $H_0$ 
+* Derive the test statistic for the observed data $t(y)$
+* Assess whether the data is compatible with $H_0$ (often by means of p-values) 
+
+## Traditional hypothesis testing - Man-Kendall 
+
+Assume that $Y_1, \ldots, Y_n$  have no serial correlation 
+
+
+$H_0:$ Time series values are independent, identically distributed  ($H_0: \tau = 0$)
+
+$H_A:$ There is a monotonic (not necessarily linear) trend  ($H_1: \tau \neq 0$)
+
+For large samples (about n>8) S is normally distributed with
+$$E( S ) = 0,\qquad  Var ( S )\simeq\frac{n(n-1)(2n+5)}{18}$$
+
+
+In practice use standardized test statistic Z and compare to Normal distribution
+$$
+Z=\left\{
+\begin{array}{cc}
+(S-1)/\sqrt{Var(S)} & S > 0\\
+0 & S =0 \\
+(S+1)/\sqrt{Var(S)} & S < 0\\
+\end{array}
+\right. 
+$$
+
+Remark: need correction of $VAR(S)$ if there are some ties
+
+## Traditional hypothesis testing - Mann-Kendall 
+
+For Flow and Urbext of the Lostock: 
+$\hat{\tau}$=`r format(with(all70005,cor(Urbext,Flow, method="k")),digits = 3)`, $Z$=`r with(all70005,format(cor.test(Urbext,Flow,method = "k")$statistic,digits = 3))`. 
+
+```{r testStats, fig.asp=0.5,fig.height="0.4\textheight",fig.align='center'}
+par(bty = "n",mgp = c(2.4,0.8,0),mai=c(0.95,0.1,0.1,0.1))
+curve(dnorm, from = -4, to = 4, yaxt = "n", ylab = " ")
+points(with(all70005,cor.test(Urbext,Flow,method = "k")$statistic),0,pch=4,lwd=3,col=2)
+```
+
+The Z-value is extreme: pvalue is `r with(all70005,format(cor.test(Urbext,Flow,method = "k")$p.value,digits = 3))`.
+
+The data is not compatible with $H_0$ ("reject $H_0$"). 
+
+## Traditional hypothesis testing - considerations
+
+* The p-value calculation relies on a set of assumptions/procedures  
+* If any of these is not valid the test is void 
+* Not rejecting $H_0$ does not imply $H_0$ is "true": the p-value is a measure of evidence (based on several assumptions)
+* p-value: a measure of how the data is consistent with $H_0$ ($P(D|H_0)$)
+* p-value is NOT the probability of $H_0$ being true ($P(H_0|D)$) - see Cohen (1994) \footnote{Cohen, Jacob. "The earth is round (p<. 05)." American psychologist 49.12 (1994): 997.} 
+* The latter is more easily obtained using Bayesian approaches (and not traditional approaches) 
+
+Tests for Hydro-meteorological records: 
+
+* Hydro-meteorological records are opportunistic samples, not experiments. 
+* Hydro-meteorological records are typically short and noisy: low power.
+
+
+## Useful Links 
+
+[Comic about testing procedures](https://xkcd.com/882/)
+
+\ 
+
+[Comic about p-values](https://xkcd.com/1478/)
+
+\ 
+
+[Build your own p-values](https://fivethirtyeight.com/features/science-isnt-broken/\#part1)
+
+
+## Type I and Type II error 
+
+
+Testing $H_{0} \leq \mu_{0}$ VS $H_{1} > \mu_{0}$ at significance level $\alpha$
+
+
+```{r pow1_h0curve, fig.height="0.65\textheight", fig.asp=0.5}
+library(latex2exp)
+mu1=3.7; mu1s=5.5
+par(mai = c(0.4,0.2,0.2,0.2), bty = "l")
+plot(c(-5,12),c(0,dnorm(0)),type="n",bty="n",axes = FALSE,xlab=" ",ylab=" ")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1)))
+mtext(side = 1, text = TeX("$\\mu_0$"),at = 0,cex=1.75)
+mtext(side = 1, text = TeX("$z_{\\alpha}$"),at = qnorm(.95),cex=1.75)
+segments(x0=0,y0=0,y1=dnorm(0),lty=2)
+segments(x0=qnorm(.95),y0=0,y1=dnorm(qnorm(.95),0),lty=2)
+```
+
+## Type I and Type II error 
+
+True value of $\mu$ is \textcolor{red}{$\mu_{1}$}
+ 
+ 
+```{r pow2_h0h1curve, fig.height="0.65\textheight", fig.asp=0.5}
+par(mai = c(0.4,0.2,0.2,0.2), bty = "l")
+plot(c(-5,12),c(0,dnorm(0)),type="n",bty="n",axes = FALSE,xlab=" ",ylab=" ")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1)))
+mtext(side = 1, text = TeX("$\\mu_0$"),at = 0,cex=1.75)
+mtext(side = 1, text = TeX("$z_{\\alpha}$"),at = qnorm(.95))
+segments(x0=0,y0=0,y1=dnorm(0),lty=2)
+segments(x0=qnorm(.95),y0=0,y1=dnorm(qnorm(.95),0),lty=2)
+mtext(side = 1, text = TeX("$\\mu_1$"),at = mu1,col=2,cex=1.75)
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1),mu1),col=2)
+```
+
+## Type I and Type II error 
+
+```{r pow2b_h0h1curvepower, fig.height="0.65\textheight", fig.asp=0.5}
+par(mai = c(0.4,0.2,0.2,0.2), bty = "l",lwd=1.3)
+plot(c(-5,12),c(0,dnorm(0)),type="n",bty="n",axes = FALSE,xlab=" ",ylab=" ")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1)))
+mtext(side = 1, text = TeX("$\\mu_0$"),at = 0,cex=1.75)
+mtext(side = 1, text = TeX("$z_{\\alpha}$"),at = qnorm(.95),cex=1.75)
+segments(x0=0,y0=0,y1=dnorm(0),lty=2)
+segments(x0=qnorm(.95),y0=0,y1=dnorm(qnorm(.95),0),lty=2)
+mtext(side = 1, text = TeX("$\\mu_1$"),at = mu1,col=2,cex=1.75)
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1),mu1),col=2)
+segments(x0=qnorm(.95),y0=0,y1=dnorm(qnorm(.95),mu1),lty=2,col=2)
+polygon(c(seq(qnorm(.95),12,by=0.1),rev(seq(qnorm(.95),12,by=0.1))),
+        c(dnorm(seq(qnorm(.95),12,by=0.1),mu1),rep(0,104)),col=2,density = 9)
+```
+
+## Type I and Type II error 
+Power increases for larger true value \textcolor{blue}{$\mu_{1}$}
+
+
+```{r pow3_h0h1scurve, fig.height="0.65\textheight", fig.asp=0.5}
+par(mai = c(0.4,0.2,0.2,0.2), bty = "l")
+plot(c(-5,12),c(0,dnorm(0)),type="n",bty="n",axes = FALSE,xlab=" ",ylab=" ")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1)))
+mtext(side = 1, text = TeX("$\\mu_0$"),at = 0,cex=1.75)
+mtext(side = 1, text = TeX("$z_{\\alpha}$"),at = qnorm(.95),cex=1.75)
+segments(x0=0,y0=0,y1=dnorm(0),lty=2)
+segments(x0=qnorm(.95),y0=0,y1=dnorm(qnorm(.95),0),lty=2)
+mtext(side = 1, text = TeX("$\\mu_1$"),at = mu1,col=2,cex=1.75)
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1),mu1),col=2,cex=1.75)
+segments(x0=qnorm(.95),y0=0,y1=dnorm(qnorm(.95),mu1),lty=2,col=2)
+polygon(c(seq(qnorm(.95),12,by=0.1),rev(seq(qnorm(.95),12,by=0.1))),
+        c(dnorm(seq(qnorm(.95),12,by=0.1),mu1),rep(0,104)),col=2,density = 9)
+mtext(side = 1, text = TeX("$\\mu^*_1$"),at = mu1s,col=4,cex=1.75)
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1),mu1s),col=4)
+segments(x0=qnorm(.95),y0=0,y1=dnorm(qnorm(.95),mu1s),lty=2,col=4)
+polygon(c(seq(qnorm(.95),12,by=0.1),rev(seq(qnorm(.95),12,by=0.1))),
+        c(dnorm(seq(qnorm(.95),12,by=0.1),mu1s),rep(0,104)),col=4,density = 9,angle=135)
+```
+
+## Type I and Type II error 
+Power depends on sample size/population properties
+
+```{r pow4_h0smallerSamp, fig.height="0.65\textheight", fig.asp=0.5}
+sdc <- 1.6
+par(mai = c(0.4,0.2,0.2,0.2), bty = "l")
+plot(c(-5,12),c(0,dnorm(0,sd=min(1,sdc))),type="n",bty="n",axes = FALSE,xlab=" ",ylab=" ")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1)),col="slategray4")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1),sd=sdc))
+mtext(side = 1, text = TeX("$\\mu_0$"),at = 0,cex=1.75)
+segments(x0=0,y0=0,y1=dnorm(0),lty=2)
+segments(x0=qnorm(.95),y0=0,y1=dnorm(qnorm(.95),0),lty=1,col="slategray4")
+segments(x0=qnorm(.95,sd=sdc),y0=0,y1=dnorm(qnorm(.95,sd=sdc),0,sd=sdc),lty=2)
+mtext(side = 1, text = TeX("$z_{\\alpha}$"),at = qnorm(.95,sd=1),col="slategray4",cex=1.75)
+mtext(side = 1, text = TeX("$z_{\\alpha}$"),at = qnorm(.95,sd=sdc),cex=1.75)
+```
+
+## Type I and Type II error 
+
+Power diminishes for \textcolor{darkred}{more variable} distribution
+
+```{r pow5_h0smallerSampH1, fig.height="0.65\textheight", fig.asp=0.5}
+par(mai = c(0.4,0.2,0.2,0.2), bty = "l")
+plot(c(-5,12),c(0,dnorm(0,sd=min(1,sdc))),type="n",bty="n",axes = FALSE,xlab=" ",ylab=" ")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1)),col="slategray4")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1),sd=sdc))
+mtext(side = 1, text = TeX("$\\mu_0$"),at = 0,cex=1.75)
+segments(x0=qnorm(.95,sd=sdc),y0=0,y1=dnorm(qnorm(.95,sd=sdc),0,sd=sdc),lty=2)
+mtext(side = 1, text = TeX("$z_{\\alpha}$"),at = qnorm(.95,sd=sdc),cex=1.75)
+mtext(side = 1, text = TeX("$\\mu_1$"),at = mu1,col=2,cex=1.75)
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1),mu1,sd=1),col="red")
+lines(seq(-5,12,by=0.1),dnorm(seq(-5,12,by=0.1),mu1,sd=sdc),col="darkred")
+polygon(c(seq(qnorm(.95,sd=sdc),12,by=0.1),rev(seq(qnorm(.95,sd=sdc),12,by=0.1))),
+        c(dnorm(seq(qnorm(.95,sd=sdc),12,by=0.1),mu1,sd=sdc),rep(0,94)),col="darkred",density = 9)
+```
+
+## Statistical tools: paramteric approaches 
+
+* Assume that each member of the sample $y_i$ comes from some distribution $Y_i$
+* Often assumed: $(Y_1, \ldots, Y_n)$ are independent and identically distributed (iid)
+* Assume that $Y_i$ follows a known distribution parametrised by $(\boldsymbol{\theta})$ 
+* (for example $Y_i \sim N(\mu, \sigma)$, with $\boldsymbol{\theta} = (\mu, \sigma)$)
+* Find estimates $\hat{\boldsymbol{\theta}}$ based on the sample
+* Estimates should somehow be derived so that there is an agreement between summaries of the data and summaries of the estimated distribution $f(\boldsymbol{y}; \boldsymbol{\theta})$  
+
+\pause  
+Parametric VS non-parametric: 
+
+* Parametric when a distribution described by **parameters** ($f(y; \boldsymbol{\theta})$)  is assumed 
+* Non-parametric when no assumption on the form of $f(y)$ is made 
+
+\pause  
+
+Advantage of parametric:
+
+* Describe the whole distribution (quantiles)
+* Easy to extend to very complex models (but estimation can be complicated) 
+* General framework 
+
+
+## Parametric approaches: estimation approaches
+
+Most common: 
+
+* Method of moments 
+* Maximum likelihood 
+* Bayesian approaches 
+
+Choice of estimation approach (can be) based on: 
+
+* Computational hurdle
+* Need for uncertainty assessment 
+* Model complexity
+* Presence of prior information (which can be formalised)
+
+## Maximum likelhood estimation 
+
+The likelihood function is defined as 
+\[L(\boldsymbol{\theta}; \boldsymbol{y}) = \prod_{i=1}^{n} f(y_i, \boldsymbol{\theta}), \] 
+but calculations typically employ the log-likelihood 
+\[l(\boldsymbol{\theta}; \boldsymbol{y}) = \sum_{i=1}^{n} \log f(y_i, \boldsymbol{\theta}).\] 
+
+
+Asymptotically ($n \rightarrow \infty$) we have that 
+$\hat{\boldsymbol{\theta}}_{ML} \sim N(\boldsymbol{\theta}, I_E(\boldsymbol{\theta}))$ 
+where $I_E(\boldsymbol{\theta})$ is the expected information matrix, with elements \[e_{i,j}(\theta) = E\left[ - \frac{d^2 l(\theta)}{d \theta_i d \theta_j} \right] \]
+Typically $I_E(\boldsymbol{\theta})$ is unknown and is replaced with the observed information matrix evaluated at $\hat{\boldsymbol{\theta}}$. 
+
+## Parametric models for change
+
+* Assume $Y_i$ distribution is $f(\boldsymbol{\theta}_i,y_i)$ 
+* Assume $\boldsymbol{\theta}_i = g(\boldsymbol{x}_i)$
+* So $Y_i = (Y|X=x_i)$ with $f(g(\boldsymbol{x}_i),y_i)$ 
+
+\ 
+
+Example. Linear regression (with two explanatory variables): 
+
+* $Y_i \sim N(\mu_i, \sigma)$; $\boldsymbol{\theta}_i = (\mu_i, \sigma)$ 
+* $\mu_i = \beta _0 + \beta_1 x_{1i} + \beta_2 x_{2i}$ - linear relationship
+* $\sigma$ is constant 
+* As a consequence: $E[Y_i] = \beta _0 + \beta_1 x_{1i} + \beta_2 x_{2i}$, $V[Y_i] = \sigma^2$ 
+
+\[l(\boldsymbol{\theta}; \boldsymbol{y}) = \sum_{i=1}^{n} \log f(y_i, \boldsymbol{\theta}) \propto - n \log(\sigma) - \frac{(y-\beta _0 - \beta_1 x_{1i} - \beta_2 x_{2i})^2}{2 \sigma^2} \] 
+ML estimates can be derived analytically: $(\hat{\beta}_0, \hat{\beta}_1,\hat{\beta}_2,\hat{\sigma})$. 
+
+And we have, for example, $\hat{\beta}_i \sim N(\beta, \sigma_{\beta_i})$. 
+
+From this once can construct confidence intervals for $\beta_i$ or perform a test such as 
+\[H_0: \beta_0 \geq \tilde{\beta} \quad \quad VS  \quad \quad H_0: \beta_0 < \tilde{\beta}\]
+By default $\tilde{\beta} = 0$, but one can test for any value and any type of statistical test (equality, larger than or equale, smaller than or equal). 
+
+
+
+## GEV 
+
+<!-- Typically defined using the CDF:  -->
+
+<!-- \[ F(y) =  \exp\left\{ -\left( 1 + \xi \frac{y-\mu}{\sigma} \right) ^{-1/\xi} \right\}\] -->
+
+<!-- * $\mu \in \mathbb{R}$: location parameter -->
+<!-- * $\sigma > 0$; scale parameter -->
+<!-- * $\xi \in \mathbb{R}$: shape parameter.  -->
+
+<!-- Note that up to $1/\xi$  moments exist, so typically one would want $\xi < 1/2$ (so the variance exist). Also, to ensure consistency of the MLE (Smith, 1985) one needs $\xi > -1$. So typically one wants $\xi \in (-1, 0.5)$.  -->
+
+<!-- $Y \sim GEV(\mu, \sigma,\xi)$ is defined on ${y: 1 + \xi (y - \mu)/\sigma > 0}$  so the domain changes depening on the sign of $\xi$:  -->
+
+<!-- * $y \in \left[ \mu -\sigma/\xi, \infty \right) $, if $\xi > 0$ (Frechet)  -->
+<!-- * $y \in \left( -\infty, \mu -\sigma/\xi \right] $, if $\xi < 0$ (Weibull)  -->
+<!-- * $y \in \left( -\infty, \infty \right) $, if $\xi = 0$ (Gumbel) -->
+
+<!-- BUT! In engineering/hydrology $Y \sim GEV(\xi, \alpha, \kappa)$ and $\kappa = -\xi$. Software can use inconsistent different parametrisation.  -->
+
+
+
+<!-- \begin{eqnarray} -->
+<!-- f_q(q)= \sigma^{-1}e^{-(1-\xi)t - e^{-t}}, \> t=\begin{cases} -->
+<!-- -\xi^{-1} \ln(1-\xi(q-\mu)/\sigma) ,  \ \  \mbox{when } \xi \neq 0 \\  -->
+<!-- (q-\mu)/\sigma , \ \ \mbox{when } \xi=0  -->
+<!-- \end{cases} -->
+<!-- \label{eq:gevPDF} -->
+<!-- \end{eqnarray} -->
+<!-- \begin{equation} -->
+<!-- F_q(q) = \exp \{ - e^{-t} \}  -->
+<!-- \label{eq:gevCDF} -->
+<!-- \end{equation} -->
+<!-- where $\mu$, $\sigma$, and $\xi$ are the location, scale and shape parameters.  -->
+<!-- The set of flow values $q$ in which the function is defined is determined by the shape parameter $\xi$ as: $-\infty  < q \leq \mu + \sigma/\xi$ if $\xi > 0$; $-\infty < q < \infty$ if $\xi = 0$; $ \mu + \sigma/\xi  < q < \infty$ if $\xi < 0$.  -->
+
+\ 
+
+Often $\nu= \log(\sigma)$ is used to ensure positive scale. 
+
+Estimation approaches: L-moments, Bayesian, maximum likelihood, maximum penalised likelihood/GML. 
+
+POT series contain information on two different processes: (i) the frequency at which a certain high threshold is exceeded and (ii) the magnitude of the peak flows. 
+Typically, the number of events recorded in each year is assumed to be Poisson distributed, while the magnitude of the exceedances above the threshold $u$ is assumed to be distributed according to a Generalized Pareto (GP) distribution
+It can be shown that the annual maxima $Q$ of a flow record in which the threshold exceeding process follows the standard Poisson-GP assumption for POT data, are asymptotically GEV distributed: $Q \sim GEV(\mu, \sigma, \xi)$. 
+
+
+
+
+
+```{r,include=FALSE}
+### code = 00060;  Stream flow, mean. daily 
+### in Ohio  
+aa <- dataRetrieval::whatNWISdata(stateCD = "OH",parameterCd="00060")
+### code = 00061 Stream flow, instantaneous
+## in TX
+bb <- dataRetrieval::whatNWISdata(parameterCd="00061", stateCD = "TX")
+## select places with most up to date data 
+bb <- bb[bb$end_date > as.Date("2017-10-01"),]
+### see https://help.waterdata.usgs.gov/codes-and-parameters/peak-streamflow-special-conditions-peak.peak_cd 
+## to understand the code for peak conditions 
+
+s07312500if <- dataRetrieval::readNWISpeak(siteNumbers = "07312500")
+s07312500dv <- dataRetrieval::readNWISdv(siteNumbers = "07312500",parameterCd="00060")
+```
+
+

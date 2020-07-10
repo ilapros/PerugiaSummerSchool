@@ -1,0 +1,28 @@
+\frametitle{Changes in Peaks - Point Process}
+\protect\hypertarget{changes-in-peaks---point-process}{}
+
+\begin{verbatim}
+## extRemes::fevd(x = Flow, data = pot70005, threshold = th, type = "PP",
+##     time.units = "15/year")
+## get(paste("return.level.fevd.", newcl, sep = ""))(x = x, return.period = return.period,
+##     return.preiod = 2)
+##
+##  PP model fitted to  Flow pot70005
+## [1] "Return levels based on GEV equivalency (i.e., return levels are for block maxima, where the blocks are years)"
+## Data are assumed to be  stationary
+## [1] "Covariate data = pot70005"
+## [1] "Return Levels for period units in years"
+##   2-year level  20-year level 100-year level
+##       24.11357       34.53006       39.62600
+\end{verbatim}
+
+\begin{verbatim}
+##  [1] 22.12975 22.24344 22.35713 22.47082 22.58452 22.69821 22.81190 22.92559
+##  [9] 23.03928 23.15297 23.26666 23.38036 23.49405 23.60774 23.72143 23.83512
+## [17] 23.94881 24.06251 24.17620 24.28989 24.40358 24.51727 24.63096 24.74466
+## [25] 24.85835 24.97204 25.08573 25.19942 25.31311 25.42680 25.54050 25.65419
+## [33] 25.76788
+\end{verbatim}
+
+\includegraphics{ProsdocimiPerugia_files/figure-beamer/ppFirstPlot-1.pdf}
+
