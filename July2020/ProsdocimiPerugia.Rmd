@@ -784,6 +784,6 @@ Replicability (i.e. being able to re-run the analysis) should be a given.
 Start any project in a replicable way: literate programming and programmatic interfaces 
 In R (and Python) this is increasingly feasible
 
-Slides code at [github.com/ilapros](www.github.com/ilapros/PerugiaSummerSchool/July2020)
+Slides code at [github.com/ilapros](https://github.com/ilapros/PerugiaSummerSchool/tree/master/July2020)
 
 
