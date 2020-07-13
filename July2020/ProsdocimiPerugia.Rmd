@@ -788,5 +788,5 @@ Start any project in a replicable way: literate programming and programmatic int
 
 In R (and Python) this is increasingly feasible. 
 
-Slides code at [github.com/ilapros](https://github.com/ilapros/PerugiaSummerSchool/tree/master/July2020)
+Slides code at [github.com/ilapros](https://github.com/ilapros/PerugiaSummerSchool/tree/master/July2020) - done in [rmarkdown](https://rmarkdown.rstudio.com/)
 
