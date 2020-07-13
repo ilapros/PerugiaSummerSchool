@@ -79,7 +79,6 @@
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \hypersetup{
   pdftitle={Changes in extremes},
-  pdfauthor={Ilaria Prosdocimi},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 \urlstyle{same} % disable monospaced font for URLs
@@ -112,9 +111,12 @@
 \definecolor{univered}{rgb}{0.75,0.01,0.3}\definecolor{darkred}{RGB}{154,2,0}
 \beamertemplatenavigationsymbolsempty\setbeamercovered{invisible}\setbeamercolor{item projected}{bg=univered}\hypersetup{colorlinks,citecolor=univered,filecolor=univered,linkcolor=univered,urlcolor=univered}\setbeamertemplate{footline}{\leavevmode\begin{beamercolorbox}[wd=.33\paperwidth,right,ht=2.25ex,dp=1ex,rightskip=4ptplus1pt]{subsection in head/foot}\end{beamercolorbox}\begin{beamercolorbox}[wd=.33\paperwidth,center,ht=2.25ex,dp=1ex]{section in head/foot}\usebeamercolor[fg]{section in foot/head}\end{beamercolorbox}\begin{beamercolorbox}[wd=.34\paperwidth,ht=2.25ex,dp=1ex,leftskip=4pt plus 1pt,rightskip=4pt plus 1pt]{subsection in head/foot} \color{univered} \hfill \tiny \insertframenumber/\inserttotalframenumber \end{beamercolorbox}}\setbeamertemplate{navigation symbols}{}\setbeamercolor{frametitle}{fg=univered}\setbeamercolor{title}{fg=univered}\setbeamercolor{author}{fg=black}\setbeamersize{text margin left=0.9em,text margin right=0.8em}\setbeamertemplate{itemize items}{$\bullet$}\setbeamercolor{itemize item}{fg=univered}
 
+\author{Ilaria Prosdocimi - Ca' Foscari University of Venice \\   ilaria.prosdocimi@unive.it}
+
+\linespread{1.4}
+
 \title{Changes in extremes}
 \subtitle{Detection and consequences}
-\author{Ilaria Prosdocimi}
 \date{13 July 2020}
 
 \begin{document}
@@ -129,8 +131,9 @@ hazards.
 Many studies investigate changes in extreme rainfall and extreme flows.
 
 Changes in magnitude/frequencies: infrastructures are designed to
-withstand extreme events of some magnitude. Problematic if these become
-more (or less!) frequent.
+withstand extreme events of some magnitude.
+
+Problematic if these become more (or less!) frequent.
 
 \end{frame}
 
@@ -230,6 +233,8 @@ Inference framework:
 
 \begin{frame}{Parameteric framework}
 \protect\hypertarget{parameteric-framework}{}
+
+\linespread{1.5}
 
 Advantage of parametric framework:
 
@@ -345,16 +350,18 @@ Example. Linear regression (with two explanatory variables):
 \tightlist
 \item
   \(Y_i \sim N(\mu_i, \sigma)\);
-  \(\boldsymbol{\theta}_i = (\mu_i, \sigma)\)
+  \(\boldsymbol{\theta}_i = (\mu_i, \sigma)\).
 \item
   \(\mu_i = \beta _0 + \beta_1 x_{1i} + \beta_2 x_{2i}\) - linear
-  relationship
+  relationship.
 \item
-  \(\sigma\) is constant
+  \(\sigma\) is constant.
 \item
   As a consequence:
   \(E[Y_i] = \beta _0 + \beta_1 x_{1i} + \beta_2 x_{2i}\),
-  \(V[Y_i] = \sigma^2\)
+  \(V[Y_i] = \sigma^2\).
+\item
+  We can describe \(Y\) and how it varies with X
 \end{itemize}
 
 \end{frame}
@@ -364,21 +371,21 @@ Example. Linear regression (with two explanatory variables):
 
 Linear regression likelihood:
 
-\[l(\boldsymbol{\theta}; \boldsymbol{y}) = \sum_{i=1}^{n} \log f(y_i, \boldsymbol{\theta}) \propto - n \log(\sigma) - \frac{(y-\beta _0 - \beta_1 x_{1i} - \beta_2 x_{2i})^2}{2 \sigma^2} \]
+\[l(\boldsymbol{\theta}; \boldsymbol{y}) = \sum_{i=1}^{n} \log f(y_i, \boldsymbol{\theta}) \propto - n \log \sigma - \frac{(y-\beta _0 - \beta_1 x_{1i} - \beta_2 x_{2i})^2}{2 \sigma^2} \]
 ML estimates can be derived analytically:
 \((\hat{\beta}_0, \hat{\beta}_1,\hat{\beta}_2,\hat{\sigma})\).
 
 And we have, for example,
 \(\hat{\beta}_i \sim N(\beta_i, \hat{\sigma}_{\beta_i})\).
 
+\pause
+
 From this once can construct confidence intervals for \(\beta_i\) or
 perform a test such as:
-\[H_0: \beta_0 \geq \tilde{\beta} \quad \quad VS  \quad \quad H_0: \beta_0 < \tilde{\beta}\]
+\[H_0: \beta_0 \geq \tilde{\beta} \quad \quad VS  \quad \quad H_1: \beta_0 < \tilde{\beta}\]
 By default \(\tilde{\beta} = 0\), but one can test for any value
-\(\tilde{\beta}\) and any type of statistical test (equality, larger
-than or equal, smaller than or equal).
-
-~
+\(\tilde{\beta}\) and statistical test (\(=\), \(\leq\),
+\(\geq\)).\footnote{Prosdocimi et al, NHESS, doi:10.5194/nhess-14-1125-2014}
 
 Notice that if \(x_j\) is a factor one can account for step changes
 (change points).
@@ -430,22 +437,12 @@ Traditional (asymptotic) results based on extremes of stationary series:
   Threshold exceedance frequency: \(N \sim Pois(\lambda)\)
 \end{itemize}
 
-\pause
-
-Exceedances frequency and magnitude traditionally modelled as separate
-processes.
-
-Frequency and magnitude of threshold exceedances can be modelled in a
-unique framework using a Point Process representation of extremes
-\footnote{Smith, Statist. Sci., doi:10.1214/ss/1177012400}. \pause This
-representation is under-utilised in hydrology.
-
 \pause  Using exceedances typically results in larger samples (so less
 variability in estimates).
 
 \pause
 
-In practice other distributions are often assumed for Flow maxima
+In practice other distributions are often assumed for Flow maxima.
 
 \end{frame}
 
@@ -483,10 +480,18 @@ In practice other distributions are often assumed for Flow maxima
 BUT! In engineering/hydrology \(Y \sim GEV(\xi, \alpha, \kappa)\) and
 \(\kappa = -\xi\). Software can use different parametrisation.
 
+\end{frame}
+
+\begin{frame}{Generalised Extreme Value distribution}
+\protect\hypertarget{generalised-extreme-value-distribution-1}{}
+
+\[\text{Quantile function (for $\xi \neq 0$)}: \ q(y, \theta) = \mu + \frac{\sigma}{\xi} \left[(-\log(1-p))^{-\xi} -1 \right] \]
+
 \pause
 
-Quantile function (for \(\xi \neq 0\)):
-\[q(y, \theta) = \mu + \frac{\sigma}{\xi} \left[(-\log(1-p))^{-\xi} -1 \right] \]
+Modelling change: \[ \mu = \mu_0+\mu_1 x\] \pause  Effective quantile
+for \(x=x^*\):
+\[\ q(y, \theta(x^*)) = \mu_0+\mu_1 x^* + \frac{\sigma}{\xi} \left[(-\log(1-p))^{-\xi} -1 \right] \]
 
 \end{frame}
 
@@ -505,6 +510,7 @@ The Lostock at Littlewood Bridge: median and effective 50-yrs event.
 Time is not a cause for change, but land cover changes impact peak
 flow.\\
 \[\mu=\mu_0 + \mu_{urb} urb \quad \text{while } (\sigma, \xi)  \text{ constant }\]
+\vspace{-1.2cm}
 
 \includegraphics{ProsdocimiPerugia_files/figure-beamer/urbextRetPlot-1.png}
 
@@ -516,6 +522,8 @@ flow.\\
 Time is not a cause for change, but soil wetness impact peak flow.\\
 \[\mu=\mu_0 + \mu_{rain} rain \quad \text{while } (\sigma, \xi)  \text{ constant }\]
 
+\vspace{-1.0cm}
+
 \includegraphics{ProsdocimiPerugia_files/figure-beamer/rainRetPlot-1.png}
 
 \end{frame}
@@ -524,7 +532,9 @@ Time is not a cause for change, but soil wetness impact peak flow.\\
 \protect\hypertarget{changes-in-amax---effect-of-rain-given-urbext}{}
 
 Separate effect of rain and urbanisation:\\
+\vspace{-0.4cm}
 \[\mu=\mu_0 + \mu_{rain} rain + \mu_{urb} urb \quad \text{while } (\sigma, \xi)  \text{ constant }\]
+\vspace{-1.0cm}
 
 \includegraphics{ProsdocimiPerugia_files/figure-beamer/rainGivenUrbRetPlot-1.png}
 
@@ -534,14 +544,17 @@ Separate effect of rain and urbanisation:\\
 \protect\hypertarget{changes-in-amax---effect-of-urbext-given-rain}{}
 
 Separate effect of rain and urbanisation:\\
+\vspace{-0.4cm}
 \[\mu=\mu_0 + \mu_{rain} rain + \mu_{urb} urb \quad \text{while } (\sigma, \xi)  \text{ constant }\]
-
+\vspace{-1.0cm}
 \includegraphics{ProsdocimiPerugia_files/figure-beamer/urbGivenRainRetPlot-1.png}
 
 \end{frame}
 
 \begin{frame}{Changes in annual maxima - estimated parameters}
 \protect\hypertarget{changes-in-annual-maxima---estimated-parameters}{}
+
+\linespread{1.0}\selectfont
 
 Rain as covariate (log-lik: -98.39)
 
@@ -584,6 +597,20 @@ se & 7.344 & 0.422 & 2.668 & 0.580 & 0.153\tabularnewline
 
 \end{frame}
 
+\begin{frame}{Changes in extremes - attribution}
+\protect\hypertarget{changes-in-extremes---attribution}{}
+
+Kendall's \(\hat{\tau}\)(Urbext, Rain) = 0.068.
+
+\includegraphics{ProsdocimiPerugia_files/figure-beamer/urbAndRain-1.png}
+
+\pause
+
+Reality is complex: linear models are a (over-simplified!)
+representation.
+
+\end{frame}
+
 \begin{frame}{Changes is peaks over threshold}
 \protect\hypertarget{changes-is-peaks-over-threshold}{}
 
@@ -600,7 +627,6 @@ Extract observations above a high threshold
 (\(Y = (X|X>u)\)).
 
 GP is the limiting distribution for the magnitude of exceedances.
-
 \[F(y, u, \boldsymbol \theta) =  1- \left( 1 + \xi \frac{y-u}{\tilde{\sigma}} \right) ^{-1/\xi}\]
 \(u\) is a constant, \(\boldsymbol\theta = (\sigma, \xi)\):
 
@@ -613,14 +639,8 @@ GP is the limiting distribution for the magnitude of exceedances.
 \end{itemize}
 
 The domain changes depending on the sign of \(\xi\):
-
-\begin{itemize}
-\tightlist
-\item
-  \(y \in \left[u, \infty \right)\), if \(\xi \geq 0\)
-\item
-  \(y \in \left( -\infty, u -\sigma/\xi \right]\), if \(\xi < 0\)
-\end{itemize}
+\(y \in \left[u, \infty \right)\), if \(\xi \geq 0\);
+\(y \in \left( -\infty, u -\sigma/\xi \right]\), if \(\xi < 0\).
 
 \[ \text{Quantile function:}\quad  q(p, u, \boldsymbol \theta) = u + \frac{\sigma}{\xi} (p^{-\xi} - 1) \]
 
@@ -628,19 +648,24 @@ The domain changes depending on the sign of \(\xi\):
 
 Modelling change: \(\sigma_0 + \sigma_1 x\)
 
-\pause
-
-Frequency of exceedances: typically modelled as a Poisson (indep. of
-magnitude).
-
 \end{frame}
 
 \begin{frame}{Point Process representation of extremes}
 \protect\hypertarget{point-process-representation-of-extremes}{}
 
+Exceedances frequency and magnitude traditionally modelled as separate
+processes.
+
+They can be modelled in a unique framework using a Point Process
+representation of extremes
+\footnote{Smith, Statist. Sci., doi:10.1214/ss/1177012400}. \pause This
+representation is under-utilised in hydrology.
+
 \(N\) = \{no. Exceedance in a Year\}. \(N \sim Pois(\lambda)\)
 
 \(P(\text{no. Exceedance in a Year})\) is linked to magnitudes.
+
+\pause
 
 Express this using GEV-parameters:
 
@@ -676,6 +701,8 @@ MLE & -9.767 & 0.845 & 7.449 & 3.862 & -0.016\tabularnewline
 se & 7.344 & 0.422 & 2.668 & 0.580 & 0.153\tabularnewline
 \bottomrule
 \end{longtable}
+
+\vspace{-0.2cm}
 
 Rain and urbext as covariate - PP:
 
@@ -715,20 +742,6 @@ The assumption is that \(Y_i=(Y|X = x_i)\) follows
 \textbf{residuals}
 
 Statistical EVT and practice are not aligned
-
-\end{frame}
-
-\begin{frame}{Changes in extremes - attribution}
-\protect\hypertarget{changes-in-extremes---attribution}{}
-
-Kendall's \(\hat{\tau}\)(Urbext, Rain) = 0.068.
-
-\includegraphics{ProsdocimiPerugia_files/figure-beamer/urbAndRain-1.png}
-
-\pause
-
-Reality is complex: linear models are a (over-simplified!)
-representation.
 
 \end{frame}
 
@@ -806,14 +819,17 @@ Today I used ``effective design events'':
 
 Choice of distribution/model has an impact on estimates of rare events.
 
-Choice of model has an impact of description of change. Compare
-effective return levels for \(x^{*}\) and \(x_0\):
+Choice of model has an impact of description of
+change\footnote{Vogel et al JAWRA doi:10.1111/j.1752-1688.2011.00541.x}.
+\[\text{GEV quantile function (for $\xi \neq 0$)}: \ q(y, \theta) = \mu + \frac{\sigma}{\xi} \left[(-\log(1-p))^{-\xi} -1 \right] \]
+
+Compare effective return levels for \(x^{*}\) and \(x_0\):
 \[q(p; \hat{\boldsymbol \theta}(x^{*})) - q(p; \hat{\boldsymbol \theta}(x_0)) = \mu_1 (x^{*}-x_0)\]
 
 \end{frame}
 
-\begin{frame}{(Statistical) reccomended reading}
-\protect\hypertarget{statistical-reccomended-reading}{}
+\begin{frame}{(Statistical) recommended reading}
+\protect\hypertarget{statistical-recommended-reading}{}
 
 Coles, S (2001), An introduction to statistical modeling of extreme
 values, Springer
@@ -832,13 +848,15 @@ Climate, Water Science and Technology Library 65, DOI
 \protect\hypertarget{doing-science-the-right-way}{}
 
 Reproducibility crisis in several fields - open science movement as a
-results.
+result.
 
 Replicability (i.e.~being able to re-run the analysis) should be a
 given.
 
 Start any project in a replicable way: literate programming and
-programmatic interfaces In R (and Python) this is increasingly feasible
+programmatic interaction with data (access, manipulation, analysis).
+
+In R (and Python) this is increasingly feasible.
 
 Slides code at
 \href{https://github.com/ilapros/PerugiaSummerSchool/tree/master/July2020}{github.com/ilapros}

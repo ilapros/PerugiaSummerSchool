@@ -4,8 +4,8 @@
 .Ruserdata
 *.log
 *.nav
-*.srm
+*.snm
 *.vrb
 *.aux
 *.toc
-**/ProsdocimiPerugia_cache
+/ProsdocimiPerugia_cache/*
